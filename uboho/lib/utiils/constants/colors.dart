@@ -7,6 +7,8 @@ class UColors {
   static const Color onboardingDotColor = Color(0xFFBD95F0);
   static const Color Lavender = Color(0xffE6E5F3);
   static const Color boxHighlightColor = Color(0xFF1E1E1E);
+  static const Color backgroundColor = Color(0xFF111111);
+  static const Color inputInactiveColor = Color(0xFF393939);
 
 
   static MaterialColor getMaterialColor(Color color) {
