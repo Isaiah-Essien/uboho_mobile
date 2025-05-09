@@ -14,4 +14,12 @@ class UTexts{
   static const String onboardingThreeTitle='Always Here';
   static const String onboardingThreeSubTitle='Uboho keeps watch 24/7, sending instant alerts to doctors and your emergency contacts so you’re never alone—because your safety and well-being always come first.';
 
+  //Create Account Title and subtitles
+  static const String createAccountTitle='Create Account';
+  static const String createAccountSubTitle='Set up your profile to unlock real-time monitoring, personalized alerts, and around-the-clock support.';
+
+  //Login title and subtitle
+  static const String loginTitle='Welcome Back!';
+  static const String loginSubtitle='Let’s get you back to monitoring safely and staying in control—your health journey continues here.';
+
 }

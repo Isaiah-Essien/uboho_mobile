@@ -9,6 +9,8 @@ class UColors {
   static const Color boxHighlightColor = Color(0xFF1E1E1E);
   static const Color backgroundColor = Color(0xFF111111);
   static const Color inputInactiveColor = Color(0xFF393939);
+  static const Color dividerColor = Color(0xFF7A7A7A);
+  static const Color footerWithTextDividerColor = Color(0xFF393939);
 
 
   static MaterialColor getMaterialColor(Color color) {

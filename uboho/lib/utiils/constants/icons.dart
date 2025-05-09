@@ -7,5 +7,5 @@ class UIcons{
   static const String warningAlert = 'assets/icons/warning_alert.svg';
 
   //Onboarding svg
-  static const String arc = 'assets/icons/arc.svg';
+  static const String dropdownIcon = 'assets/icons/white_dropdown.svg';
 }

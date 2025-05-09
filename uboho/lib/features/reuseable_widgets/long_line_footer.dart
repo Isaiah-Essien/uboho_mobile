@@ -1,83 +1,67 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-
 import '../../utiils/constants/colors.dart';
 
-class LongLineFooter extends StatelessWidget {
-  final String message;
-  final String actionText;
-  final VoidCallback onTap;
+class FooterText extends StatelessWidget {
+  final String fullText;
+  final Map<String, VoidCallback> links;
 
-  const LongLineFooter({
+  const FooterText({
     super.key,
-    required this.message,
-    required this.actionText,
-    required this.onTap,
+    required this.fullText,
+    required this.links,
   });
 
   @override
   Widget build(BuildContext context) {
+    final spans = <TextSpan>[];
+    String remainingText = fullText;
+
+    links.forEach((linkText, onTap) {
+      final index = remainingText.indexOf(linkText);
+      if (index >= 0) {
+        // Add plain text before the link
+        if (index > 0) {
+          spans.add(TextSpan(text: remainingText.substring(0, index)));
+        }
+
+        // Add the clickable link text
+        spans.add(
+          TextSpan(
+            text: linkText,
+            style: const TextStyle(
+              color: Colors.white,
+              decoration: TextDecoration.underline,
+              fontWeight: FontWeight.normal, // Not bold
+            ),
+            recognizer: TapGestureRecognizer()..onTap = onTap,
+          ),
+        );
+
+        // Remove processed part from the string
+        remainingText = remainingText.substring(index + linkText.length);
+      }
+    });
+
+    // Add any remaining plain text
+    if (remainingText.isNotEmpty) {
+      spans.add(TextSpan(text: remainingText));
+    }
+
     return Column(
       children: [
-        const Divider(color: Colors.white12),
+        const Divider(color: UColors.footerWithTextDividerColor),
         const SizedBox(height: 10),
-        GestureDetector(
-          onTap: onTap,
+        Center(
           child: RichText(
+            textAlign: TextAlign.center,
             text: TextSpan(
-              text: message,
-              style: const TextStyle(color: Colors.white70),
-              children: [
-                TextSpan(
-                  text: actionText,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                  ),
-                )
-              ],
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+              children: spans,
             ),
           ),
         ),
       ],
-    );
-  }
-}
-
-
-class FooterText extends StatelessWidget {
-  final String text;
-  final String linkText;
-  final VoidCallback onTap;
-
-  const FooterText({
-    super.key,
-    required this.text,
-    required this.linkText,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: GestureDetector(
-        onTap: onTap,
-        child: RichText(
-          text: TextSpan(
-            text: '$text ',
-            style: const TextStyle(color: Colors.white54),
-            children: [
-              TextSpan(
-                text: linkText,
-                style: const TextStyle(
-                  color: UColors.primaryColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
