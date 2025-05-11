@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../../utiils/constants/colors.dart';
-import '../../../utiils/constants/text_strings.dart';
-
-import '../../reuseable_widgets/custom_input.dart';
-import '../../reuseable_widgets/long_line_footer.dart';
+import 'package:uboho/utiils/constants/colors.dart';
+import 'package:uboho/utiils/constants/text_strings.dart';
+import 'package:uboho/utiils/popups/new_password_popup.dart';
 import '../../reuseable_widgets/onboarding_title_subtitle.dart';
+import '../../reuseable_widgets/custom_input.dart';
 import '../../reuseable_widgets/primary_button.dart';
-import '../create_account/create_account.dart';
-import 'forgot_password.dart';
+import '../login/login.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class NewPasswordScreen extends StatelessWidget {
+  const NewPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController idOrEmailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
     return Scaffold(
@@ -51,19 +47,14 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 20),
 
                       // Title + Subtitle
-                      OnboardingTitleSubtitle(
-                        title: UTexts.loginTitle,
-                        subtitle: UTexts.loginSubtitle,
+                      const OnboardingTitleSubtitle(
+                        title: UTexts.newPasswordTitle,
+                        subtitle: UTexts.newPasswordSubTitle,
                       ),
 
                       const SizedBox(height: 32),
 
-                      // Input Fields
-                      CustomInputField(
-                        hintText: 'Patient ID or Email',
-                        controller: idOrEmailController,
-                      ),
-                      const SizedBox(height: 16),
+                      // Password Field
                       CustomInputField(
                         hintText: 'Password',
                         isPassword: true,
@@ -72,42 +63,16 @@ class LoginScreen extends StatelessWidget {
 
                       const SizedBox(height: 24),
 
-                      // Login Button
+                      // Submit Button
                       PrimaryButton(
-                        text: 'Login',
+                        text: 'Change Password',
                         onPressed: () {
-                          // Handle login
+                          // Navigate to popup or success screen here
+                          showPasswordUpdatedPopup(context);
                         },
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // Forgot Password
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () =>Get.to(ForgotPassword()),
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
                       ),
 
                       const Spacer(),
-
-
-                      // Footer
-                      FooterText(
-                        fullText: 'Don’t have an account? Sign Up',
-                        links: {
-                          'Sign Up': () => Get.to(() => const CreateAccountScreen()),
-                        },
-                      ),
-
                       const SizedBox(height: 16),
                     ],
                   ),

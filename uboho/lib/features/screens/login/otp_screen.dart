@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../../utiils/constants/colors.dart';
-import '../../../utiils/constants/text_strings.dart';
-
+import 'package:uboho/utiils/constants/colors.dart';
+import 'package:uboho/utiils/constants/text_strings.dart';
+import '../../controllers/opt_controller.dart';
 import '../../reuseable_widgets/custom_input.dart';
-import '../../reuseable_widgets/long_line_footer.dart';
 import '../../reuseable_widgets/onboarding_title_subtitle.dart';
 import '../../reuseable_widgets/primary_button.dart';
-import '../create_account/create_account.dart';
-import 'forgot_password.dart';
+import 'new_password.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class OtpScreen extends StatelessWidget {
+  final String email; // pass this in when routing from ForgotPassword
+
+  const OtpScreen({super.key, required this.email});
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController idOrEmailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+    final otpCodeController = TextEditingController();
+    final controller = Get.put(OTPController());
+
+    controller.setEmail(email);
+    controller.startCountdown();
 
     return Scaffold(
       backgroundColor: UColors.backgroundColor,
@@ -32,7 +34,6 @@ class LoginScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Top back icon
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Container(
@@ -47,67 +48,49 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 20),
 
-                      // Title + Subtitle
                       OnboardingTitleSubtitle(
-                        title: UTexts.loginTitle,
-                        subtitle: UTexts.loginSubtitle,
+                        title: UTexts.otpScreenTitle,
+                        subtitle:
+                        'We’ve sent an OTP code, please check your email ${controller.userEmail}',
                       ),
 
                       const SizedBox(height: 32),
 
-                      // Input Fields
                       CustomInputField(
-                        hintText: 'Patient ID or Email',
-                        controller: idOrEmailController,
-                      ),
-                      const SizedBox(height: 16),
-                      CustomInputField(
-                        hintText: 'Password',
-                        isPassword: true,
-                        controller: passwordController,
+                        hintText: 'Code',
+                        controller: otpCodeController,
                       ),
 
                       const SizedBox(height: 24),
 
-                      // Login Button
                       PrimaryButton(
-                        text: 'Login',
-                        onPressed: () {
-                          // Handle login
-                        },
+                        text: 'Verify Code',
+                        onPressed: () =>Get.to(NewPasswordScreen()),
                       ),
 
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 20),
 
-                      // Forgot Password
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () =>Get.to(ForgotPassword()),
+                      Obx(() => Center(
+                        child: controller.secondsLeft.value > 0
+                            ? Text(
+                          'Resend in ${controller.secondsLeft.value}s',
+                          style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.w600),
+                        )
+                            : TextButton(
+                          onPressed: controller.resendCode,
                           child: const Text(
-                            'Forgot Password?',
+                            'Resend Code',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
                             ),
                           ),
                         ),
-                      ),
-
+                      )),
                       const Spacer(),
-
-
-                      // Footer
-                      FooterText(
-                        fullText: 'Don’t have an account? Sign Up',
-                        links: {
-                          'Sign Up': () => Get.to(() => const CreateAccountScreen()),
-                        },
-                      ),
-
                       const SizedBox(height: 16),
                     ],
                   ),
