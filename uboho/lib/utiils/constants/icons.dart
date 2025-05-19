@@ -8,4 +8,12 @@ class UIcons{
 
   //Onboarding svg
   static const String dropdownIcon = 'assets/icons/white_dropdown.svg';
+
+  //Main Navigation Icons
+  static const String homeIcon='assets/icons/home_icon.svg';
+  static const String settingsIcon='assets/icons/settings_icon.svg';
+  static const String chatIcon='assets/icons/chat_icon.svg';
+
+  //Logos
+  static const String uVector='assets/logos/U_vector.svg';
 }

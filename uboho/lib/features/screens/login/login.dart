@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../utiils/constants/colors.dart';
 import '../../../utiils/constants/text_strings.dart';
 
+import '../../../utiils/navigations/main_nav.dart';
 import '../../reuseable_widgets/custom_input.dart';
 import '../../reuseable_widgets/long_line_footer.dart';
 import '../../reuseable_widgets/onboarding_title_subtitle.dart';
@@ -77,6 +78,7 @@ class LoginScreen extends StatelessWidget {
                         text: 'Login',
                         onPressed: () {
                           // Handle login
+                          Get.offAll(() => const MainNavigation());
                         },
                       ),
 

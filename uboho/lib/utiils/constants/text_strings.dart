@@ -30,4 +30,8 @@ class UTexts{
   static const String newPasswordTitle='New password';
   static const String newPasswordSubTitle='Enter your new password here. Please ensure it is a strong password that you can easily remember';
 
+  //Chat Screen
+  static const String chatTitle='Chat';
+  static const String chatSubTitle='Let\'s get you back to monitoring safely and staying in control—your health journey continues here.';
+
 }
