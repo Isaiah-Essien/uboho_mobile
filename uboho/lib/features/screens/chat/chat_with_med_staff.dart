@@ -50,7 +50,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: Row(
                 children: [
                   Container(
@@ -63,18 +63,18 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                       onPressed: () => Get.back(),
                     ),
                   ),
-                  const SizedBox(width: 34),
+                  const SizedBox(width: 8),
                   const Expanded(
                     child: Text(
-                      'Chat with a medical staff',
+                      "Chat with a medical staff",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
-                      textAlign: TextAlign.left,
                     ),
                   ),
+                  const SizedBox(width: 58), // Reserve space to center the title
                 ],
               ),
             ),

@@ -1,9 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uboho/features/screens/settings/personal_info.dart';
 import 'package:uboho/utiils/constants/colors.dart';
+
+import '../chat/medical_info.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -79,8 +83,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               // Group 1
               _buildSettingsGroup([
-                _buildSettingsTile("Personal information"),
-                _buildSettingsTile("Medical information"),
+                _buildSettingsTile("Personal information", onTap: () => Get.to(() => const PersonalInformationScreen())),
+                _buildSettingsTile("Medical information", onTap: () => Get.to(() => const MedicalInformationScreen())),
                 _buildSettingsTile("Emergency contact"),
                 _buildSwitchTile("Notifications", isNotificationOn, (val) {
                   setState(() => isNotificationOn = val);
@@ -152,13 +156,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSettingsTile(String title, {Widget? trailing}) {
+  Widget _buildSettingsTile(String title, {Widget? trailing, VoidCallback? onTap}) {
     return ListTile(
-      onTap: () {},
+      onTap: onTap ?? () {},
       title: Text(title, style: const TextStyle(color: Colors.white)),
       trailing: trailing ?? const Icon(Icons.chevron_right, color: Colors.white70),
     );
   }
+
 
   Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
     return SwitchListTile(
