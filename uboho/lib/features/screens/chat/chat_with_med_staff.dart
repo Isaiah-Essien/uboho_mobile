@@ -16,6 +16,7 @@ class ChatWithMedicalStaffScreen extends StatefulWidget {
 class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen> {
   final TextEditingController _messageController = TextEditingController();
   final List<Map<String, String>> _messages = [];
+  final ScrollController _scrollController = ScrollController();
 
   void _sendMessage() {
     if (_messageController.text.trim().isEmpty) return;
@@ -23,11 +24,21 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
     setState(() {
       _messages.add({
         'text': _messageController.text.trim(),
-        'time': DateFormat('hh:mm a').format(DateTime.now()),
+        'time': DateFormat('MMM d, HH:mm').format(DateTime.now()),
       });
     });
 
     _messageController.clear();
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -52,7 +63,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                       onPressed: () => Get.back(),
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 34),
                   const Expanded(
                     child: Text(
                       'Chat with a medical staff',
@@ -61,22 +72,22 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                         fontWeight: FontWeight.w400,
                         fontSize: 14,
                       ),
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.left,
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Messages
+            // Messages List
             Expanded(
               child: ListView.builder(
-                reverse: true,
+                controller: _scrollController,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 itemCount: _messages.length + 1,
                 itemBuilder: (context, index) {
-                  if (index == _messages.length) {
-                    // Received message hardcoded
+                  if (index == 0) {
+                    // First static received message
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Row(
@@ -118,7 +129,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                const Text(
+                                Text(
                                   "01:04 PM",
                                   style: TextStyle(fontSize: 10, color: Colors.white38),
                                 ),
@@ -129,8 +140,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                       ),
                     );
                   } else {
-                    // Sent messages
-                    final message = _messages[index];
+                    final message = _messages[index - 1];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Row(
@@ -163,7 +173,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                           const SizedBox(width: 8),
                           const CircleAvatar(
                             radius: 24,
-                            backgroundImage: AssetImage("assets/images/sender.png"),
+                            backgroundImage: AssetImage("assets/images/smiley_man.jpeg"),
                           ),
                         ],
                       ),
@@ -205,7 +215,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                     IconButton(
                       icon: const Icon(LucideIcons.paperclip, color: UColors.inputInactiveColor),
                       onPressed: () {
-                        // Handle attachment (logic to add later)
+                        // Handle attachment (to be added)
                       },
                     ),
                     const SizedBox(width: 6),
@@ -225,6 +235,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                 ),
               ),
             ),
+
             const SizedBox(height: 12),
           ],
         ),
