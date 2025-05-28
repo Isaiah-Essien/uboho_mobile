@@ -7,7 +7,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uboho/features/screens/settings/personal_info.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 
-import '../chat/medical_info.dart';
+import 'about_uboho.dart';
+import 'medical_info.dart';
+import 'emergency_contact.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -85,7 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildSettingsGroup([
                 _buildSettingsTile("Personal information", onTap: () => Get.to(() => const PersonalInformationScreen())),
                 _buildSettingsTile("Medical information", onTap: () => Get.to(() => const MedicalInformationScreen())),
-                _buildSettingsTile("Emergency contact"),
+                _buildSettingsTile("Emergency contact", onTap: ()=>Get.to(EmergencyContactScreen())),
                 _buildSwitchTile("Notifications", isNotificationOn, (val) {
                   setState(() => isNotificationOn = val);
                 }),
@@ -95,7 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               // Group 2
               _buildSettingsGroup([
-                _buildSettingsTile("About Uboho"),
+                _buildSettingsTile("About Uboho", onTap: ()=>Get.to(AboutUbohoScreen())),
                 _buildSettingsTile("Privacy Policy"),
                 _buildSettingsTile("Terms & Conditions"),
                 _buildSettingsTile(

@@ -64,7 +64,12 @@ class _CustomInputFieldState extends State<CustomInputField> {
 
             hint: Text(widget.hintText, style: const TextStyle(color: Colors.white70)),
             dropdownColor: UColors.backgroundColor,
-            icon: SvgPicture.asset(UIcons.dropdownIcon),
+            icon: SvgPicture.asset(
+              UIcons.dropdownIcon,
+              height: 5.51,
+              width: 10.5,
+            ),
+
             isExpanded: true,
             style: const TextStyle(color: Colors.white),
             onChanged: widget.onDropdownChanged,

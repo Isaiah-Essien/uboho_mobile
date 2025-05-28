@@ -43,6 +43,7 @@ flutter:
      - assets/icons/
      - assets/logos/
      - assets/fonts/
+     - assets/african_flags/
 
   fonts:
      - family: Gilmer

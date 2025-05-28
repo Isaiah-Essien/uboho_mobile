@@ -34,4 +34,5 @@ class UTexts{
   static const String chatTitle='Chat';
   static const String chatSubTitle='Let\'s get you back to monitoring safely and staying in control—your health journey continues here.';
 
+  static const String aboutUboho="Uboho is an innovative mobile application designed to support individuals living with epilepsy and neurological disorders through smart monitoring and timely intervention. Built with a focus on accessibility, Uboho allows users to chat with medical professionals, track seizure-related activity, and receive care notifications in real-time.\n\n The app leverages artificial intelligence and motion detection to analyze subtle changes in movement patterns that may signal the onset of a seizure. With integrated emergency contact features and data-driven insights, Uboho empowers users, caregivers, and healthcare providers to respond quickly and effectively.\n\n Uboho is not just a medical support tool — it's a commitment to dignity, safety, and personalized healthcare for underserved communities in Africa and beyond.";
 }
