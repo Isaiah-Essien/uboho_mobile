@@ -16,4 +16,9 @@ class UIcons{
 
   //Logos
   static const String uVector='assets/logos/U_vector.svg';
+
+  //home
+  static const String noteIcon='assets/icons/note_icon.svg';
+  static const String motionIntensityIcon='assets/icons/motion_inten.svg';
+  static const String rotationIntensityIcon='assets/icons/rotation_inten.svg';
 }
