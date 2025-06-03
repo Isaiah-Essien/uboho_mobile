@@ -1,0 +1,58 @@
+name: uboho
+description: "Uboho Mobile App for Epilepsy Detection"
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  cupertino_icons: ^1.0.8
+  connectivity_plus: ^6.1.4
+  flutter_svg: ^2.1.0
+  get: ^4.7.2
+  lucide_icons: ^0.257.0
+  intl: ^0.20.2
+  image_picker: ^1.1.2
+  sensors_plus: ^6.1.1
+  fl_chart: ^0.71.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+  flutter_lints: ^5.0.0
+
+
+
+# The following section is specific to Flutter packages.
+flutter:
+
+
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+     - assets/images/
+     - assets/icons/
+     - assets/logos/
+     - assets/fonts/
+     - assets/african_flags/
+
+  fonts:
+     - family: Gilmer
+       fonts:
+         - asset: assets/fonts/Gilmer Bold.otf
+         - asset: assets/fonts/Gilmer Heavy.otf
+         - asset: assets/fonts/Gilmer Light.otf
+         - asset: assets/fonts/Gilmer Medium.otf
+         - asset: assets/fonts/Gilmer Outline.otf
+         - asset: assets/fonts/Gilmer Regular.otf
