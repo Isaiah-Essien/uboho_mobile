@@ -150,7 +150,7 @@ flutter run
 - run `flutter build apk --release` to have an apk file of uboho
 
 ## Relevant Links
-![Watch Demo of the Front end and Initial Set up](https://drive.google.com/file/d/1Y4XGzpOYjPDC3eEgaZ9sZ6qHwTNWMSwX/view?usp=sharing)
-![APK file](https://drive.google.com/file/d/1X-Jkno1MoEbwFLt8oQcU3e9K9mqQwa1X/view?usp=drive_link)
-![figma design](https://www.figma.com/design/EjFiGZ5k5acmHJRQBd7kbL/Uboho?node-id=0-1&t=KELwLbz414nI3asK-1)
+[Watch Demo of the Front end and Initial Set up](https://drive.google.com/file/d/1Y4XGzpOYjPDC3eEgaZ9sZ6qHwTNWMSwX/view?usp=sharing)
+[APK file](https://drive.google.com/file/d/1X-Jkno1MoEbwFLt8oQcU3e9K9mqQwa1X/view?usp=drive_link)
+[figma design](https://www.figma.com/design/EjFiGZ5k5acmHJRQBd7kbL/Uboho?node-id=0-1&t=KELwLbz414nI3asK-1)
 
