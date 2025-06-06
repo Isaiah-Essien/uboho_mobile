@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 import 'package:uboho/utiils/constants/icons.dart';
 import 'activity_card.dart';
@@ -25,11 +27,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   StreamSubscription? accelSub;
   StreamSubscription? gyroSub;
+  Timer? firestoreTimer;
 
   @override
   void initState() {
     super.initState();
 
+    // Listen to accelerometer data
     accelSub = accelerometerEventStream().listen((event) {
       ax = event.x;
       ay = event.y;
@@ -37,14 +41,21 @@ class _HomeScreenState extends State<HomeScreen> {
       _processMotion();
     });
 
+    // Listen to gyroscope data
     gyroSub = gyroscopeEventStream().listen((event) {
       gx = event.x;
       gy = event.y;
       gz = event.z;
       _processRotation();
     });
+
+    // Stream sensor data to Firestore every 1 second
+    firestoreTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _uploadSensorDataToFirestore();
+    });
   }
 
+  // Compute and plot motion magnitude
   void _processMotion() {
     final motion = sqrt(ax * ax + ay * ay + az * az);
     setState(() {
@@ -53,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Compute and plot rotation magnitude
   void _processRotation() {
     final rotation = sqrt(gx * gx + gy * gy + gz * gz);
     setState(() {
@@ -62,10 +74,37 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Upload latest sensor data to Firestore
+  void _uploadSensorDataToFirestore() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? 'mock-patient-uid';
+
+    final sensorData = {
+      'x_accel': ax,
+      'y_accel': ay,
+      'z_accel': az,
+      'x_gyro': gx,
+      'y_gyro': gy,
+      'z_gyro': gz,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    };
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('patients')
+          .doc(uid)
+          .collection('sensors')
+          .doc('current')
+          .set(sensorData);
+    } catch (e) {
+      debugPrint("Error uploading sensor data: $e");
+    }
+  }
+
   @override
   void dispose() {
     accelSub?.cancel();
     gyroSub?.cancel();
+    firestoreTimer?.cancel();
     super.dispose();
   }
 
@@ -77,11 +116,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: UColors.backgroundColor,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 24), // prevents overflow at the bottom
+        padding: const EdgeInsets.only(bottom: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Purple Header with Rounded Bottom
             Stack(
               clipBehavior: Clip.none,
               children: [
@@ -201,9 +239,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
 
-            const SizedBox(height: 64), // spacing below floating box
+            const SizedBox(height: 64),
 
-            // Motion Intensity Card
             MetricCard(
               title: "Motion Intensity",
               description: "Your movement pattern analysis over the day.",
@@ -213,7 +250,6 @@ class _HomeScreenState extends State<HomeScreen> {
               dataPoints: motionPoints,
             ),
 
-            // Rotation Activity Card
             MetricCard(
               title: "Rotation Activity",
               description: "Your rotation activity tracked by sensors.",
