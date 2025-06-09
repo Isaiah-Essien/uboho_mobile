@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../service_backend/account_login/patient_account_login_controller.dart';
 import '../../../utiils/constants/colors.dart';
 import '../../../utiils/constants/text_strings.dart';
 
@@ -78,7 +79,11 @@ class LoginScreen extends StatelessWidget {
                         text: 'Login',
                         onPressed: () {
                           // Handle login
-                          Get.offAll(() => const MainNavigation());
+                          PatientLoginController.loginPatient(
+                            input: idOrEmailController.text.trim(),
+                            password: passwordController.text.trim(),
+                            context: context,
+                          );
                         },
                       ),
 

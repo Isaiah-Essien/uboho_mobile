@@ -6,6 +6,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uboho/features/screens/notification_center/notification_screen.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 import 'package:uboho/utiils/constants/icons.dart';
 import 'activity_card.dart';
@@ -29,11 +30,15 @@ class _HomeScreenState extends State<HomeScreen> {
   StreamSubscription? gyroSub;
   Timer? firestoreTimer;
 
+  String patientName = '';
+  String patientId = '';
+
   @override
   void initState() {
     super.initState();
 
-    // Listen to accelerometer data
+    _fetchPatientDetails();
+
     accelSub = accelerometerEventStream().listen((event) {
       ax = event.x;
       ay = event.y;
@@ -41,7 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _processMotion();
     });
 
-    // Listen to gyroscope data
     gyroSub = gyroscopeEventStream().listen((event) {
       gx = event.x;
       gy = event.y;
@@ -49,13 +53,38 @@ class _HomeScreenState extends State<HomeScreen> {
       _processRotation();
     });
 
-    // Stream sensor data to Firestore every 1 second
     firestoreTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       _uploadSensorDataToFirestore();
     });
   }
 
-  // Compute and plot motion magnitude
+  Future<void> _fetchPatientDetails() async {
+    final authUid = FirebaseAuth.instance.currentUser?.uid;
+    if (authUid == null) return;
+
+    final hospitalsSnapshot =
+    await FirebaseFirestore.instance.collection('hospitals').get();
+
+    for (final hospitalDoc in hospitalsSnapshot.docs) {
+      final patientsRef =
+      hospitalDoc.reference.collection('patients');
+
+      final matchQuery = await patientsRef
+          .where('authId', isEqualTo: authUid)
+          .limit(1)
+          .get();
+
+      if (matchQuery.docs.isNotEmpty) {
+        final doc = matchQuery.docs.first;
+        setState(() {
+          patientName = doc['name'] ?? '';
+          patientId = doc.id;
+        });
+        break;
+      }
+    }
+  }
+
   void _processMotion() {
     final motion = sqrt(ax * ax + ay * ay + az * az);
     setState(() {
@@ -64,7 +93,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Compute and plot rotation magnitude
   void _processRotation() {
     final rotation = sqrt(gx * gx + gy * gy + gz * gz);
     setState(() {
@@ -74,9 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Upload latest sensor data to Firestore
   void _uploadSensorDataToFirestore() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid ?? 'mock-patient-uid';
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
 
     final sensorData = {
       'x_accel': ax,
@@ -110,8 +138,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final motionPeak = motionPoints.isEmpty ? "--" : motionPoints.map((e) => e.y).reduce(max).toStringAsFixed(1);
-    final rotationPeak = rotationPoints.isEmpty ? "--" : rotationPoints.map((e) => e.y).reduce(max).toStringAsFixed(1);
+    final motionPeak = motionPoints.isEmpty
+        ? "--"
+        : motionPoints.map((e) => e.y).reduce(max).toStringAsFixed(1);
+    final rotationPeak = rotationPoints.isEmpty
+        ? "--"
+        : rotationPoints.map((e) => e.y).reduce(max).toStringAsFixed(1);
 
     return Scaffold(
       backgroundColor: UColors.backgroundColor,
@@ -144,22 +176,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           backgroundImage: AssetImage('assets/images/smiley_man.jpeg'),
                         ),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Mastou Oumarou",
-                                style: TextStyle(
+                                patientName.isEmpty ? "..." : patientName,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
-                                "PID9843084",
-                                style: TextStyle(
+                                patientId.isEmpty ? "" : patientId,
+                                style: const TextStyle(
                                   color: Colors.white70,
                                   fontSize: 12,
                                 ),
@@ -174,7 +206,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Colors.white.withOpacity(0.1),
                             border: Border.all(color: Colors.white.withOpacity(0.15)),
                           ),
-                          child: const Icon(Icons.notifications, color: Colors.white, size: 18),
+                          child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => NotificationCenterScreen()));
+                              },
+                              child: const Icon(Icons.notifications, color: Colors.white, size: 18)),
                         ),
                       ],
                     ),

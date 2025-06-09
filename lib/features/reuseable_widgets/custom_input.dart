@@ -49,7 +49,10 @@ class _CustomInputFieldState extends State<CustomInputField> {
   @override
   Widget build(BuildContext context) {
     if (widget.isDropdown) {
-      // Dropdown Field
+      final dropdownValue = widget.dropdownItems?.contains(widget.selectedItem) == true
+          ? widget.selectedItem
+          : null;
+
       return Container(
         height: 48,
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -60,27 +63,27 @@ class _CustomInputFieldState extends State<CustomInputField> {
         ),
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
-            value: widget.dropdownItems!.contains(widget.selectedItem) ? widget.selectedItem : null,
-
+            value: dropdownValue,
             hint: Text(widget.hintText, style: const TextStyle(color: Colors.white70)),
             dropdownColor: UColors.backgroundColor,
             icon: SvgPicture.asset(
               UIcons.dropdownIcon,
-              height: 5.51,
+              height: 5.5,
               width: 10.5,
             ),
-
             isExpanded: true,
             style: const TextStyle(color: Colors.white),
             onChanged: widget.onDropdownChanged,
-            items: widget.dropdownItems!
-                .map((item) => DropdownMenuItem(value: item, child: Text(item)))
-                .toList(),
+            items: widget.dropdownItems?.map((item) {
+              return DropdownMenuItem(
+                value: item,
+                child: Text(item),
+              );
+            }).toList(),
           ),
         ),
       );
     } else {
-      // Text or Password Field
       final bool isActive =
           _focusNode.hasFocus || (widget.controller?.text.isNotEmpty ?? false);
 
@@ -104,9 +107,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
                 _obscureText ? Icons.visibility_off : Icons.visibility,
                 color: Colors.grey,
               ),
-              onPressed: () {
-                setState(() => _obscureText = !_obscureText);
-              },
+              onPressed: () => setState(() => _obscureText = !_obscureText),
             )
                 : null,
             enabledBorder: OutlineInputBorder(

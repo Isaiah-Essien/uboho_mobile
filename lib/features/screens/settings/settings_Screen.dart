@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -7,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uboho/features/screens/settings/personal_info.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 
+import '../onboarding/onboarding_screen.dart';
 import 'about_uboho.dart';
 import 'medical_info.dart';
 import 'emergency_contact.dart';
@@ -114,7 +116,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
+                      Get.offAll(() => OnboardingScreen());
+                    },
                     icon: const Icon(LucideIcons.logOut, color: Colors.white),
                     label: const Text("Logout", style: TextStyle(color: Colors.white)),
                     style: ElevatedButton.styleFrom(

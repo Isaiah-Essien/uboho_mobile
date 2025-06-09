@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:uboho/features/screens/onboarding/onboarding1.dart';
 import 'package:uboho/features/screens/onboarding/onboarding_screen.dart';
 import 'package:uboho/utiils/constants/text_strings.dart';
+import '../../../service_backend/account_creation/patient_account_creation_controller.dart';
 import '../../../utiils/constants/colors.dart';
 import '../../controllers/create_account_controller.dart';
 import '../../reuseable_widgets/custom_input.dart';
@@ -18,13 +18,6 @@ class CreateAccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(CreateAccountController());
 
-    final List<String> hospitals = [
-      'General Hospital',
-      'PeaceCare Clinic',
-      'Unity Medical Center',
-      'HealthPoint',
-    ];
-
     return Scaffold(
       backgroundColor: UColors.backgroundColor,
       body: SafeArea(
@@ -38,7 +31,7 @@ class CreateAccountScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Top skip-style back icon
+                      // Back icon
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Container(
@@ -50,7 +43,7 @@ class CreateAccountScreen extends StatelessWidget {
                           child: IconButton(
                             icon: const Icon(Icons.chevron_left, color: Colors.white),
                             onPressed: () {
-                              Get.offAll(() =>  OnboardingScreen());
+                              Get.offAll(() => OnboardingScreen());
                             },
                           ),
                         ),
@@ -64,44 +57,60 @@ class CreateAccountScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 32),
 
-                      Obx(() => CustomInputField(
-                        hintText: 'Select Hospital/organization',
-                        isDropdown: true,
-                        dropdownItems: hospitals,
-                        selectedItem: controller.selectedDropdownItem.value,
-                        onDropdownChanged: controller.selectDropdownItem,
-                      )),
+                      // Hospital Dropdown
+                      Obx(() {
+                        return CustomInputField(
+                          hintText: 'Select Hospital/organization',
+                          isDropdown: true,
+                          dropdownItems: controller.hospitals.isEmpty
+                              ? []
+                              : controller.hospitals,
+                          selectedItem: controller.selectedDropdownItem.value,
+                          onDropdownChanged: (value) {
+                            controller.selectDropdownItem(value);
+                          },
+                        );
+                      }),
 
                       const SizedBox(height: 16),
+
                       CustomInputField(
-                        hintText: 'Patient ID',
+                        hintText: 'Patient ID or Email',
                         controller: controller.patientIdController,
                       ),
+
                       const SizedBox(height: 16),
+
                       CustomInputField(
                         hintText: 'Create Password',
                         isPassword: true,
                         controller: controller.passwordController,
                       ),
+
                       const SizedBox(height: 24),
 
                       PrimaryButton(
                         text: 'Access My Dashboard',
                         onPressed: () {
-                          // handle submit
+                          PatientAccountController.activateAccountWithPassword(
+                            selectedHospitalName: controller.selectedDropdownItem.value ?? '',
+                            patientInput: controller.patientIdController.text.trim(),
+                            password: controller.passwordController.text.trim(),
+                            context: context,
+                          );
                         },
                       ),
 
                       const SizedBox(height: 16),
 
                       Row(
-                        children: [
-                          const Expanded(child: Divider(color: UColors.dividerColor)),
-                          const Padding(
+                        children: const [
+                          Expanded(child: Divider(color: UColors.dividerColor)),
+                          Padding(
                             padding: EdgeInsets.symmetric(horizontal: 10),
                             child: Text("OR", style: TextStyle(color: UColors.dividerColor)),
                           ),
-                          const Expanded(child: Divider(color: UColors.dividerColor)),
+                          Expanded(child: Divider(color: UColors.dividerColor)),
                         ],
                       ),
 
