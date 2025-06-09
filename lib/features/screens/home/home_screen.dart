@@ -30,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   StreamSubscription? gyroSub;
   Timer? firestoreTimer;
 
+  //Declare  Patient data to be passed on the screens
   String patientName = '';
   String patientId = '';
 

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uboho/features/reuseable_widgets/custom_input.dart';
@@ -51,7 +53,7 @@ class _AddEmergencyContactScreenState extends State<AddEmergencyContactScreen> {
               const OnboardingTitleSubtitle(
                 title: "New Contact",
                 subtitle:
-                "Set up a new emergency contact! We will reach out to them incase you need help",
+                "Set up a new emergency contact! We will reach out to them in case you need help",
               ),
 
               const SizedBox(height: 32),
@@ -122,11 +124,66 @@ class _AddEmergencyContactScreenState extends State<AddEmergencyContactScreen> {
 
               PrimaryButton(
                 text: "Add Contact",
-                onPressed: () {
-                  // TODO: Add contact logic
-                  print("Name: ${nameController.text}");
-                  print("Phone: $selectedCountryCode ${phoneController.text}");
-                },
+                  onPressed: () async {
+                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                    if (uid == null) {
+                      Get.snackbar("Error", "User not authenticated");
+                      return;
+                    }
+
+                    final hospitals = await FirebaseFirestore.instance.collection('hospitals').get();
+                    DocumentReference? patientRef;
+
+                    for (final hospital in hospitals.docs) {
+                      final patients = hospital.reference.collection('patients');
+                      final query = await patients.where('authId', isEqualTo: uid).limit(1).get();
+
+                      if (query.docs.isNotEmpty) {
+                        patientRef = query.docs.first.reference;
+                        break;
+                      }
+                    }
+
+                    if (patientRef == null) {
+                      Get.snackbar("Error", "Patient record not found.");
+                      return;
+                    }
+
+                    final contact = {
+                      'name': nameController.text.trim(),
+                      'relation': relationController.text.trim(),
+                      'email': emailController.text.trim(),
+                      'phone': phoneController.text.trim(),
+                      'countryCode': selectedCountryCode,
+                      'isPrimary': selectedPrimary == 'Yes',
+                      'createdAt': DateTime.now().toIso8601String(),
+                    };
+
+                    final doc = await patientRef.get();
+                    final data = doc.data() as Map<String, dynamic>? ?? {};
+
+                    // Safely get or initialize emergencyContacts
+                    List existing = [];
+                    if (data.containsKey('emergencyContacts') && data['emergencyContacts'] is List) {
+                      existing = List.from(data['emergencyContacts']);
+                    }
+
+                    // Unset previous primary if needed
+                    if (selectedPrimary == 'Yes') {
+                      existing = existing.map((c) {
+                        c['isPrimary'] = false;
+                        return c;
+                      }).toList();
+                    }
+
+                    existing.add(contact);
+
+                    await patientRef.update({'emergencyContacts': existing});
+
+                    Get.snackbar("Success", "Emergency contact added.");
+                    Get.back();
+                  }
+
               ),
 
               const SizedBox(height: 32),

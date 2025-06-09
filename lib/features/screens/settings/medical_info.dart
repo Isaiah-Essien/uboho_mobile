@@ -1,9 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 
-class MedicalInformationScreen extends StatelessWidget {
+class MedicalInformationScreen extends StatefulWidget {
   const MedicalInformationScreen({super.key});
+
+  @override
+  State<MedicalInformationScreen> createState() => _MedicalInformationScreenState();
+}
+
+class _MedicalInformationScreenState extends State<MedicalInformationScreen> {
+  String height = '';
+  String bloodSugar = '';
+  String condition = '';
+  String weight = '';
+  String hospitalName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMedicalInfo();
+  }
+
+  Future<void> _loadMedicalInfo() async {
+    final authUid = FirebaseAuth.instance.currentUser?.uid;
+    if (authUid == null) return;
+
+    final hospitalsSnapshot =
+    await FirebaseFirestore.instance.collection('hospitals').get();
+
+    for (final hospitalDoc in hospitalsSnapshot.docs) {
+      final patientsRef = hospitalDoc.reference.collection('patients');
+
+      final matchQuery = await patientsRef
+          .where('authId', isEqualTo: authUid)
+          .limit(1)
+          .get();
+
+      if (matchQuery.docs.isNotEmpty) {
+        final doc = matchQuery.docs.first;
+        setState(() {
+          height = doc['height'] ?? '';
+          bloodSugar = doc['bloodSugarLevel'] ?? '';
+          condition = doc['medicalConditions'] ?? '';
+          weight = doc['weight'] ?? '';
+          hospitalName = doc['hospitalName'] ?? '';
+        });
+        break;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +83,11 @@ class MedicalInformationScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 58), // Reserve space to center the title
+                  const SizedBox(width: 58),
                 ],
               ),
             ),
@@ -53,14 +101,16 @@ class MedicalInformationScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
-                  children: const [
-                    _InfoRow(label: "Name", value: "Mastou Oumarou"),
-                    _DividerLine(),
-                    _InfoRow(label: "Assigned Doctor", value: "Kingsley Budu"),
-                    _DividerLine(),
-                    _InfoRow(label: "Phone Number", value: "+250 790 139 525"),
-                    _DividerLine(),
-                    _InfoRow(label: "Doctor ID", value: "DID1234569876"),
+                  children: [
+                    _InfoRow(label: "Height", value: height.isNotEmpty ? height : '...'),
+                    const _DividerLine(),
+                    _InfoRow(label: "Blood Sugar level", value: bloodSugar.isNotEmpty ? bloodSugar : '...'),
+                    const _DividerLine(),
+                    _InfoRow(label: "Medical Conditions", value: condition.isNotEmpty ? condition : '...'),
+                    const _DividerLine(),
+                    _InfoRow(label: "Weight", value: weight.isNotEmpty ? weight : '...'),
+                    const _DividerLine(),
+                    _InfoRow(label: "Hospital Name", value: hospitalName.isNotEmpty ? hospitalName : '...'),
                   ],
                 ),
               ),
