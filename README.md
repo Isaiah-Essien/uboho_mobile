@@ -12,6 +12,7 @@
 - [APK file](https://drive.google.com/file/d/1X-Jkno1MoEbwFLt8oQcU3e9K9mqQwa1X/view?usp=drive_link)
 - [figma design](https://www.figma.com/design/EjFiGZ5k5acmHJRQBd7kbL/Uboho?node-id=0-1&t=KELwLbz414nI3asK-1)
 - [Model Notebook](https://colab.research.google.com/drive/1A0p8y6ESvFTNLna3j7ZdFADVQKIYOiaY?usp=sharing)
+- [Link to repo](https://github.com/Isaiah-Essien/uboho_mobile)
 
 ---
 ## What Uboho Does
