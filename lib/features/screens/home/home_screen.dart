@@ -6,9 +6,13 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:uboho/features/screens/notification_center/notification_screen.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 import 'package:uboho/utiils/constants/icons.dart';
+
+import '../../../service_backend/settiings_logics/profile_picture_service.dart';
 import 'activity_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -30,15 +34,18 @@ class _HomeScreenState extends State<HomeScreen> {
   StreamSubscription? gyroSub;
   Timer? firestoreTimer;
 
-  //Declare  Patient data to be passed on the screens
   String patientName = '';
   String patientId = '';
+  String? profileImageUrl;
+
+  final ProfileImageService _imageService = ProfileImageService();
 
   @override
   void initState() {
     super.initState();
 
     _fetchPatientDetails();
+    _loadProfileImage();
 
     accelSub = accelerometerEventStream().listen((event) {
       ax = event.x;
@@ -59,6 +66,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadProfileImage();
+  }
+
+
   Future<void> _fetchPatientDetails() async {
     final authUid = FirebaseAuth.instance.currentUser?.uid;
     if (authUid == null) return;
@@ -67,8 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseFirestore.instance.collection('hospitals').get();
 
     for (final hospitalDoc in hospitalsSnapshot.docs) {
-      final patientsRef =
-      hospitalDoc.reference.collection('patients');
+      final patientsRef = hospitalDoc.reference.collection('patients');
 
       final matchQuery = await patientsRef
           .where('authId', isEqualTo: authUid)
@@ -83,6 +96,15 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         break;
       }
+    }
+  }
+
+  Future<void> _loadProfileImage() async {
+    final url = await _imageService.fetchProfileImageUrl();
+    if (url != null) {
+      setState(() {
+        profileImageUrl = url;
+      });
     }
   }
 
@@ -171,11 +193,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 24,
                           backgroundColor: Colors.white24,
-                          backgroundImage: AssetImage('assets/images/smiley_man.jpeg'),
+                          backgroundImage: profileImageUrl != null
+                              ? CachedNetworkImageProvider(profileImageUrl!)
+                              : null,
                         ),
+
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -205,16 +230,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white.withOpacity(0.1),
-                            border: Border.all(color: Colors.white.withOpacity(0.15)),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.15),
+                            ),
                           ),
                           child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => NotificationCenterScreen()));
-                              },
-                              child: const Icon(Icons.notifications, color: Colors.white, size: 18)),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      NotificationCenterScreen(),
+                                ),
+                              );
+                            },
+                            child: const Icon(
+                              Icons.notifications,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -227,11 +262,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   left: 20,
                   right: 20,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
                       color: UColors.boxHighlightColor,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: UColors.footerWithTextDividerColor),
+                      border:
+                      Border.all(color: UColors.footerWithTextDividerColor),
                     ),
                     child: Row(
                       children: [
@@ -242,7 +279,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: BoxDecoration(
                             color: UColors.backgroundColor,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: UColors.footerWithTextDividerColor),
+                            border: Border.all(
+                                color: UColors.footerWithTextDividerColor),
                           ),
                           child: SvgPicture.asset(
                             UIcons.noteIcon,

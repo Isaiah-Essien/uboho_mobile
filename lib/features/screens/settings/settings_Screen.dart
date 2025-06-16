@@ -1,13 +1,16 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:uboho/features/screens/settings/personal_info.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 
+import '../../../service_backend/settiings_logics/profile_picture_service.dart';
 import '../onboarding/onboarding_screen.dart';
 import 'about_uboho.dart';
 import 'medical_info.dart';
@@ -22,17 +25,68 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool isNotificationOn = true;
-
   final ImagePicker _picker = ImagePicker();
-  XFile? _selectedImage;
+  final ProfileImageService _imageService = ProfileImageService();
 
-  Future<void> _pickImage() async {
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() => _selectedImage = pickedFile);
-      // TODO: Upload or store the selected image
+  XFile? _selectedImage;
+  String patientName = '';
+  String? profileImageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPatientName();
+    _loadProfileImage();
+  }
+
+  Future<void> _fetchPatientName() async {
+    final authUid = FirebaseAuth.instance.currentUser?.uid;
+    if (authUid == null) return;
+
+    final hospitalsSnapshot =
+    await FirebaseFirestore.instance.collection('hospitals').get();
+
+    for (final hospitalDoc in hospitalsSnapshot.docs) {
+      final patientsRef = hospitalDoc.reference.collection('patients');
+
+      final matchQuery = await patientsRef
+          .where('authId', isEqualTo: authUid)
+          .limit(1)
+          .get();
+
+      if (matchQuery.docs.isNotEmpty) {
+        final doc = matchQuery.docs.first;
+        setState(() {
+          patientName = doc['name'] ?? '';
+        });
+        break;
+      }
     }
   }
+
+  Future<void> _loadProfileImage() async {
+    final url = await _imageService.fetchProfileImageUrl();
+    if (url != null) {
+      setState(() {
+        profileImageUrl = url;
+      });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    XFile? uploadedImage;
+
+    uploadedImage = await _imageService.pickAndUploadImage(
+      context: context,
+      onUploadComplete: (url) {
+        setState(() {
+          profileImageUrl = url;
+          _selectedImage = uploadedImage;
+        });
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,12 +105,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   CircleAvatar(
                     radius: 40,
+                    backgroundColor: Colors.white24,
                     backgroundImage: _selectedImage != null
-                        ? FileImage(
-                      File(_selectedImage!.path),
-                    ) as ImageProvider
-                        : const AssetImage('assets/images/smiley_man.jpeg'),
+                        ? FileImage(File(_selectedImage!.path))
+                        : (profileImageUrl != null
+                        ? CachedNetworkImageProvider(profileImageUrl!)
+                        : null),
                   ),
+
                   GestureDetector(
                     onTap: _pickImage,
                     child: Container(
@@ -76,20 +132,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
 
               const SizedBox(height: 12),
-              const Text(
-                "Mastou Oumarou",
-                style: TextStyle(
+
+              Text(
+                patientName.isEmpty ? "Loading..." : patientName,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
               ),
+
               const SizedBox(height: 24),
 
-              // Group 1
               _buildSettingsGroup([
-                _buildSettingsTile("Personal information", onTap: () => Get.to(() => const PersonalInformationScreen())),
-                _buildSettingsTile("Medical information", onTap: () => Get.to(() => const MedicalInformationScreen())),
-                _buildSettingsTile("Emergency contact", onTap: ()=>Get.to(EmergencyContactScreen())),
+                _buildSettingsTile("Personal information",
+                    onTap: () => Get.to(() => const PersonalInformationScreen())),
+                _buildSettingsTile("Medical information",
+                    onTap: () => Get.to(() => const MedicalInformationScreen())),
+                _buildSettingsTile("Emergency contact",
+                    onTap: () => Get.to(EmergencyContactScreen())),
                 _buildSwitchTile("Notifications", isNotificationOn, (val) {
                   setState(() => isNotificationOn = val);
                 }),
@@ -97,9 +157,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               const SizedBox(height: 16),
 
-              // Group 2
               _buildSettingsGroup([
-                _buildSettingsTile("About Uboho", onTap: ()=>Get.to(AboutUbohoScreen())),
+                _buildSettingsTile("About Uboho",
+                    onTap: () => Get.to(AboutUbohoScreen())),
                 _buildSettingsTile("Privacy Policy"),
                 _buildSettingsTile("Terms & Conditions"),
                 _buildSettingsTile(
@@ -110,7 +170,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               const SizedBox(height: 24),
 
-              // Logout Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: SizedBox(
@@ -170,7 +229,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       trailing: trailing ?? const Icon(Icons.chevron_right, color: Colors.white70),
     );
   }
-
 
   Widget _buildSwitchTile(String title, bool value, Function(bool) onChanged) {
     return SwitchListTile(

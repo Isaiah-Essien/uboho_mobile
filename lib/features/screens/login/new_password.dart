@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 import 'package:uboho/utiils/constants/text_strings.dart';
 import 'package:uboho/utiils/popups/new_password_popup.dart';
+
 import '../../reuseable_widgets/onboarding_title_subtitle.dart';
 import '../../reuseable_widgets/custom_input.dart';
 import '../../reuseable_widgets/primary_button.dart';
@@ -14,6 +15,7 @@ class NewPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController passwordController = TextEditingController();
+    final GlobalKey<CustomInputFieldState> passwordKey = GlobalKey<CustomInputFieldState>();
 
     return Scaffold(
       backgroundColor: UColors.backgroundColor,
@@ -56,9 +58,11 @@ class NewPasswordScreen extends StatelessWidget {
 
                       // Password Field
                       CustomInputField(
+                        key: passwordKey,
                         hintText: 'Password',
                         isPassword: true,
                         controller: passwordController,
+                        validationType: InputValidationType.password,
                       ),
 
                       const SizedBox(height: 24),
@@ -67,7 +71,7 @@ class NewPasswordScreen extends StatelessWidget {
                       PrimaryButton(
                         text: 'Change Password',
                         onPressed: () {
-                          // Navigate to popup or success screen here
+                          if (!passwordKey.currentState!.validate()) return;
                           showPasswordUpdatedPopup(context);
                         },
                       ),

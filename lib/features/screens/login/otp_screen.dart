@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 import 'package:uboho/utiils/constants/text_strings.dart';
+
 import '../../controllers/opt_controller.dart';
 import '../../reuseable_widgets/custom_input.dart';
 import '../../reuseable_widgets/onboarding_title_subtitle.dart';
@@ -9,13 +10,15 @@ import '../../reuseable_widgets/primary_button.dart';
 import 'new_password.dart';
 
 class OtpScreen extends StatelessWidget {
-  final String email; // pass this in when routing from ForgotPassword
+  final String email;
 
   const OtpScreen({super.key, required this.email});
 
   @override
   Widget build(BuildContext context) {
     final otpCodeController = TextEditingController();
+    final GlobalKey<CustomInputFieldState> otpKey = GlobalKey<CustomInputFieldState>();
+
     final controller = Get.put(OTPController());
 
     controller.setEmail(email);
@@ -59,6 +62,7 @@ class OtpScreen extends StatelessWidget {
                       const SizedBox(height: 32),
 
                       CustomInputField(
+                        key: otpKey,
                         hintText: 'Code',
                         controller: otpCodeController,
                       ),
@@ -67,7 +71,11 @@ class OtpScreen extends StatelessWidget {
 
                       PrimaryButton(
                         text: 'Verify Code',
-                        onPressed: () =>Get.to(NewPasswordScreen()),
+                        onPressed: () {
+                          if (!otpKey.currentState!.validate()) return;
+
+                          Get.to(NewPasswordScreen());
+                        },
                       ),
 
                       const SizedBox(height: 20),
@@ -76,7 +84,8 @@ class OtpScreen extends StatelessWidget {
                         child: controller.secondsLeft.value > 0
                             ? Text(
                           'Resend in ${controller.secondsLeft.value}s',
-                          style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.w600),
+                          style: const TextStyle(
+                              color: Colors.white54, fontWeight: FontWeight.w600),
                         )
                             : TextButton(
                           onPressed: controller.resendCode,

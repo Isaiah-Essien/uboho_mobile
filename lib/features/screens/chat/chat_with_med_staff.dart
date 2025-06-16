@@ -3,8 +3,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:uboho/utiils/constants/colors.dart';
 import 'package:uboho/utiils/constants/icons.dart';
+import 'package:uboho/service_backend/settiings_logics/profile_picture_service.dart';
 
 class ChatWithMedicalStaffScreen extends StatefulWidget {
   const ChatWithMedicalStaffScreen({super.key});
@@ -17,6 +20,31 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
   final TextEditingController _messageController = TextEditingController();
   final List<Map<String, String>> _messages = [];
   final ScrollController _scrollController = ScrollController();
+
+  final ProfileImageService _imageService = ProfileImageService();
+  String? profileImageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileImage();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadProfileImage(); // Ensures profile image refreshes when navigating back
+  }
+
+
+  Future<void> _loadProfileImage() async {
+    final url = await _imageService.fetchProfileImageUrl();
+    if (url != null) {
+      setState(() {
+        profileImageUrl = url;
+      });
+    }
+  }
 
   void _sendMessage() {
     if (_messageController.text.trim().isEmpty) return;
@@ -129,7 +157,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                Text(
+                                const Text(
                                   "01:04 PM",
                                   style: TextStyle(fontSize: 10, color: Colors.white38),
                                 ),
@@ -171,9 +199,12 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const CircleAvatar(
+                          CircleAvatar(
                             radius: 24,
-                            backgroundImage: AssetImage("assets/images/smiley_man.jpeg"),
+                            backgroundColor: Colors.white24,
+                            backgroundImage: profileImageUrl != null
+                                ? CachedNetworkImageProvider(profileImageUrl!)
+                                : null,
                           ),
                         ],
                       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uboho/features/screens/onboarding/onboarding_screen.dart';
 import 'package:uboho/utiils/constants/text_strings.dart';
+
 import '../../../service_backend/account_creation/patient_account_creation_controller.dart';
 import '../../../utiils/constants/colors.dart';
 import '../../controllers/create_account_controller.dart';
@@ -17,6 +18,10 @@ class CreateAccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(CreateAccountController());
+
+    final GlobalKey<CustomInputFieldState> hospitalKey = GlobalKey<CustomInputFieldState>();
+    final GlobalKey<CustomInputFieldState> idOrEmailKey = GlobalKey<CustomInputFieldState>();
+    final GlobalKey<CustomInputFieldState> passwordKey = GlobalKey<CustomInputFieldState>();
 
     return Scaffold(
       backgroundColor: UColors.backgroundColor,
@@ -60,6 +65,7 @@ class CreateAccountScreen extends StatelessWidget {
                       // Hospital Dropdown
                       Obx(() {
                         return CustomInputField(
+                          key: hospitalKey,
                           hintText: 'Select Hospital/organization',
                           isDropdown: true,
                           dropdownItems: controller.hospitals.isEmpty
@@ -75,6 +81,7 @@ class CreateAccountScreen extends StatelessWidget {
                       const SizedBox(height: 16),
 
                       CustomInputField(
+                        key: idOrEmailKey,
                         hintText: 'Patient ID or Email',
                         controller: controller.patientIdController,
                       ),
@@ -82,9 +89,11 @@ class CreateAccountScreen extends StatelessWidget {
                       const SizedBox(height: 16),
 
                       CustomInputField(
+                        key: passwordKey,
                         hintText: 'Create Password',
                         isPassword: true,
                         controller: controller.passwordController,
+                        validationType: InputValidationType.password,
                       ),
 
                       const SizedBox(height: 24),
@@ -92,6 +101,12 @@ class CreateAccountScreen extends StatelessWidget {
                       PrimaryButton(
                         text: 'Access My Dashboard',
                         onPressed: () {
+                          if (!hospitalKey.currentState!.validate() ||
+                              !idOrEmailKey.currentState!.validate() ||
+                              !passwordKey.currentState!.validate()) {
+                            return;
+                          }
+
                           PatientAccountController.activateAccountWithPassword(
                             selectedHospitalName: controller.selectedDropdownItem.value ?? '',
                             patientInput: controller.patientIdController.text.trim(),

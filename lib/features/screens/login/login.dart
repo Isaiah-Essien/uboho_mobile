@@ -21,6 +21,9 @@ class LoginScreen extends StatelessWidget {
     final TextEditingController idOrEmailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
+    final GlobalKey<CustomInputFieldState> emailKey = GlobalKey<CustomInputFieldState>();
+    final GlobalKey<CustomInputFieldState> passwordKey = GlobalKey<CustomInputFieldState>();
+
     return Scaffold(
       backgroundColor: UColors.backgroundColor,
       body: SafeArea(
@@ -62,14 +65,17 @@ class LoginScreen extends StatelessWidget {
 
                       // Input Fields
                       CustomInputField(
+                        key: emailKey,
                         hintText: 'Patient ID or Email',
                         controller: idOrEmailController,
                       ),
                       const SizedBox(height: 16),
                       CustomInputField(
+                        key: passwordKey,
                         hintText: 'Password',
                         isPassword: true,
                         controller: passwordController,
+                        validationType: InputValidationType.password,
                       ),
 
                       const SizedBox(height: 24),
@@ -78,7 +84,11 @@ class LoginScreen extends StatelessWidget {
                       PrimaryButton(
                         text: 'Login',
                         onPressed: () {
-                          // Handle login
+                          if (!emailKey.currentState!.validate() ||
+                              !passwordKey.currentState!.validate()) {
+                            return;
+                          }
+
                           PatientLoginController.loginPatient(
                             input: idOrEmailController.text.trim(),
                             password: passwordController.text.trim(),
@@ -93,7 +103,7 @@ class LoginScreen extends StatelessWidget {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () =>Get.to(ForgotPassword()),
+                          onPressed: () => Get.to(ForgotPassword()),
                           child: const Text(
                             'Forgot Password?',
                             style: TextStyle(
@@ -105,7 +115,6 @@ class LoginScreen extends StatelessWidget {
                       ),
 
                       const Spacer(),
-
 
                       // Footer
                       FooterText(

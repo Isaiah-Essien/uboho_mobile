@@ -14,6 +14,7 @@ class ForgotPassword extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController idOrEmailController = TextEditingController();
+    final GlobalKey<CustomInputFieldState> emailKey = GlobalKey<CustomInputFieldState>();
 
     return Scaffold(
       backgroundColor: UColors.backgroundColor,
@@ -53,8 +54,10 @@ class ForgotPassword extends StatelessWidget {
                       const SizedBox(height: 32),
 
                       CustomInputField(
+                        key: emailKey,
                         hintText: 'Patient ID or Email',
                         controller: idOrEmailController,
+                        validationType: InputValidationType.email,
                       ),
 
                       const SizedBox(height: 24),
@@ -62,16 +65,10 @@ class ForgotPassword extends StatelessWidget {
                       PrimaryButton(
                         text: 'Submit',
                         onPressed: () {
+                          if (!emailKey.currentState!.validate()) return;
+
                           final email = idOrEmailController.text.trim();
-                          if (email.isNotEmpty) {
-                            Get.to(() => OtpScreen(email: email));
-                          } else {
-                            // Optional: show a snackbar or toast
-                            Get.snackbar('Error', 'Please enter your email or Patient ID',
-                              backgroundColor: Colors.redAccent,
-                              colorText: Colors.white,
-                            );
-                          }
+                          Get.to(() => OtpScreen(email: email));
                         },
                       ),
 
