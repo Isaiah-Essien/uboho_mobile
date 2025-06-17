@@ -6,6 +6,8 @@ import 'package:uboho/features/screens/settings/settings_screen.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 import 'package:uboho/utiils/constants/icons.dart';
 
+import '../../service_backend/chat_service/chat_unread_counter_service.dart';
+
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
@@ -15,12 +17,28 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
+  bool _hasUnreadMessages = false;
 
   final List<Widget> _screens = const [
     HomeScreen(),
     ChatScreen(),
     SettingsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUnreadMessages();
+  }
+
+  Future<void> _checkUnreadMessages() async {
+    final hasUnread = await UnreadMessageChecker.hasUnreadMessages();
+    if (mounted) {
+      setState(() {
+        _hasUnreadMessages = hasUnread;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,21 +61,9 @@ class _MainNavigationState extends State<MainNavigation> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildNavItem(
-                iconPath: UIcons.homeIcon,
-                label: 'Home',
-                index: 0,
-              ),
-              _buildNavItem(
-                iconPath: UIcons.chatIcon,
-                label: 'Chat',
-                index: 1,
-              ),
-              _buildNavItem(
-                iconPath: UIcons.settingsIcon,
-                label: 'Settings',
-                index: 2,
-              ),
+              _buildNavItem(iconPath: UIcons.homeIcon, label: 'Home', index: 0),
+              _buildNavItem(iconPath: UIcons.chatIcon, label: 'Chat', index: 1),
+              _buildNavItem(iconPath: UIcons.settingsIcon, label: 'Settings', index: 2),
             ],
           ),
         ),
@@ -86,19 +92,36 @@ class _MainNavigationState extends State<MainNavigation> {
           child: Center(
             child: FittedBox(
               fit: BoxFit.scaleDown,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  SvgPicture.asset(
-                    iconPath,
-                    height: 25.6,
-                    width: 25.6,
-                    colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        iconPath,
+                        height: 25.6,
+                        width: 25.6,
+                        colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      ),
+                      if (isSelected && label.isNotEmpty) ...[
+                        const SizedBox(width: 8),
+                        Text(label, style: const TextStyle(color: Colors.white)),
+                      ],
+                    ],
                   ),
-                  if (isSelected && label.isNotEmpty) ...[
-                    const SizedBox(width: 8),
-                    Text(label, style: const TextStyle(color: Colors.white)),
-                  ],
+                  if (_hasUnreadMessages && index == 1) // chat tab
+                    Positioned(
+                      top: -6,
+                      right: -6,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          color: UColors.primaryColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -107,6 +130,4 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
     );
   }
-
-
 }

@@ -24,8 +24,8 @@ class ChatScreen extends StatelessWidget {
             children: [
               // Title
               OnboardingTitleSubtitle(
-                  title: UTexts.chatTitle,
-                  subtitle: UTexts.chatSubTitle
+                title: UTexts.chatTitle,
+                subtitle: UTexts.chatSubTitle,
               ),
               const SizedBox(height: 24),
 
@@ -33,7 +33,7 @@ class ChatScreen extends StatelessWidget {
               _buildChatTile(
                 iconPath: UIcons.uVector,
                 label: 'Chat with a medical staff',
-                onTap: ()=>Get.to(ChatWithMedicalStaffScreen()),
+                onTap: () => Get.to(() => const ChatWithMedicalStaffScreen()),
               ),
 
               const SizedBox(height: 16),
@@ -67,7 +67,7 @@ class ChatScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // U Logo in circular black container
+            // U Logo
             Container(
               width: 48,
               height: 48,
@@ -83,7 +83,6 @@ class ChatScreen extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
             ),
-
             const SizedBox(width: 16),
 
             // Label
@@ -98,7 +97,7 @@ class ChatScreen extends StatelessWidget {
               ),
             ),
 
-            // Right Arrow
+            // Right arrow
             const Icon(
               LucideIcons.chevronRight,
               color: Colors.white,
