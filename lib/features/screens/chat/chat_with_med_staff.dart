@@ -56,45 +56,58 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
     final uid = currentUser.uid;
 
     final hospitalsSnap = await FirebaseFirestore.instance.collection('hospitals').get();
+
     for (final hospitalDoc in hospitalsSnap.docs) {
       final hospitalRef = hospitalDoc.reference;
+
+      // Step 1: Look for the patient using authId
       final patientSnap = await hospitalRef
           .collection('patients')
           .where('authId', isEqualTo: uid)
           .limit(1)
           .get();
 
-      if (patientSnap.docs.isNotEmpty) {
-        final patientDoc = patientSnap.docs.first;
-        hospitalId = hospitalRef.id;
-        patientId = patientDoc.id;
-        patientName = patientDoc['name'] ?? '';
+      if (patientSnap.docs.isEmpty) continue;
 
-        final convSnap = await hospitalRef.collection('conversations').get();
-        for (final doc in convSnap.docs) {
-          final participants = List<String>.from(doc['participants'] ?? []);
-          if (!participants.contains(patientId)) continue;
+      // Patient is found in this hospital
+      final patientDoc = patientSnap.docs.first;
 
-          conversationId = doc.id;
-          final parts = conversationId.split('_');
-          if (parts.length == 2) {
-            patientId = parts[0];
-            adminId = parts[1];
+      hospitalId = hospitalRef.id;
+      patientId = patientDoc.id;
+      patientName = patientDoc['name'] ?? '';
+      adminId = patientDoc['createdBy']; // THIS is the admin
+      conversationId = '${patientId}_$adminId';
+
+      final conversationRef = hospitalRef.collection('conversations').doc(conversationId);
+      final conversationDoc = await conversationRef.get();
+
+      if (!conversationDoc.exists) {
+        // New user: create conversation for the first time
+        await conversationRef.set({
+          'participants': [patientId, adminId],
+          'lastMessage': '',
+          'lastMessageTime': Timestamp.now(),
+          'unreadCount': {
+            patientId: 0,
+            adminId: 0,
           }
-
-          await hospitalRef
-              .collection('conversations')
-              .doc(conversationId)
-              .update({'unreadCount.$patientId': 0});
-
-          setState(() => _isLoading = false);
-          return;
-        }
+        });
+      } else {
+        // Existing conversation: clear unread count
+        await conversationRef.update({'unreadCount.$patientId': 0});
       }
+
+      setState(() => _isLoading = false);
+      return;
     }
 
+    // Patient not found in any hospital
+    debugPrint('Patient not found in any hospital');
     setState(() => _isLoading = false);
   }
+
+
+
 
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();

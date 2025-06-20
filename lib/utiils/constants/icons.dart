@@ -21,4 +21,7 @@ class UIcons{
   static const String noteIcon='assets/icons/note_icon.svg';
   static const String motionIntensityIcon='assets/icons/motion_inten.svg';
   static const String rotationIntensityIcon='assets/icons/rotation_inten.svg';
+
+  //Seizure Alert
+  static const String whiteUVector='assets/icons/white_u_vector.svg';
 }

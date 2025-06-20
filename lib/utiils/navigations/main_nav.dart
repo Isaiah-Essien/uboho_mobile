@@ -80,7 +80,15 @@ class _MainNavigationState extends State<MainNavigation> {
 
     return Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => _currentIndex = index),
+        onTap: () async {
+          setState(() => _currentIndex = index);
+
+          // If switching to Chat tab, recheck unread messages
+          if (index == 1) {
+            await Future.delayed(const Duration(milliseconds: 200));
+            await _checkUnreadMessages();
+          }
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
           height: 64,
@@ -109,7 +117,7 @@ class _MainNavigationState extends State<MainNavigation> {
                       ],
                     ],
                   ),
-                  if (_hasUnreadMessages && index == 1) // chat tab
+                  if (_hasUnreadMessages && index == 1)
                     Positioned(
                       top: -6,
                       right: -6,
