@@ -108,7 +108,6 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
 
 
 
-
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty || conversationId.isEmpty) return;

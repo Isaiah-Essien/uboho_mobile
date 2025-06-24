@@ -1,8 +1,3 @@
-# Required for TFLite GPU and NNAPI delegates
+# (Optional) Keep only basic TensorFlow Lite classes if you use reflection or Flutter plugins rely on it
 -keep class org.tensorflow.** { *; }
 -dontwarn org.tensorflow.**
-
-# Keep class members used by reflection
--keepclassmembers class * {
-    @androidx.annotation.Keep *;
-}

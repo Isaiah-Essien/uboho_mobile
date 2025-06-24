@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uboho/features/screens/onboarding/onboarding_screen.dart';
+import 'package:uboho/service_backend/seizure_prediction/global_seizure_service.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 import 'package:uboho/utiils/device/network_manager.dart';
-
-import 'features/screens/onboarding/onboarding1.dart';
-
-
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -14,7 +11,8 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize AssetProvider
+    // Start the seizure monitoring service globally
+    SeizureMonitorService.instance.initialize(navigatorKey);
 
     return NetworkManager(
       child: GetMaterialApp(
