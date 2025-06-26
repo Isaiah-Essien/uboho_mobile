@@ -71,7 +71,8 @@ class EmailSender {
         <div style="font-family: sans-serif; padding: 20px; background-color: #f7f7f7;">
           <div style="max-width: 600px; margin: auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 0 8px rgba(0,0,0,0.1);">
             <div style="background-color: #672BB5; padding: 20px; text-align: center;">
-              <img src="https://raw.githubusercontent.com/Isaiah-Essien/uboho_mobile/main/assets/logos/U_vector.svg" alt="Uboho Logo" height="40" />
+              <img src="https://raw.githubusercontent.com/Isaiah-Essien/uboho_mobile/main/assets/logos/primary.png
+" alt="Uboho Logo" height="40" />
               <h2 style="color: white; margin: 10px 0 0;">Seizure Alert</h2>
             </div>
             <div style="padding: 20px; color: #333;">
