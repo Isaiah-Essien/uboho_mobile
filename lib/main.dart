@@ -1,4 +1,6 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'app.dart';
@@ -18,6 +20,8 @@ Future<void> main() async {
 
   // Register GetX controllers
   Get.put(OnboardingController());
+
+  await dotenv.load(fileName: ".env");
 
   // Run the app
   runApp(const App());

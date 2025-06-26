@@ -1,11 +1,8 @@
 import 'dart:async';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import '../popups/alert.dart';
-
 
 class NetworkManager extends StatefulWidget {
   final Widget child; // The main app content
@@ -72,25 +69,33 @@ class _NetworkManagerState extends State<NetworkManager> {
   }
 
   void _showNoInternetAlert() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        duration: Duration(seconds: 6),
-        content: ErrorAlert(message: "No Internet Connection!"),
-      ),
-    );
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          duration: Duration(seconds: 6),
+          content: ErrorAlert(message: "No Internet Connection!"),
+        ),
+      );
+    });
   }
 
   void _showInternetRestoredAlert() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        duration: Duration(seconds: 6),
-        content: InformativeAlert(message: "Internet Connection Restored!"),
-      ),
-    );
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          duration: Duration(seconds: 6),
+          content: InformativeAlert(message: "Internet Connection Restored!"),
+        ),
+      );
+    });
   }
 
   @override

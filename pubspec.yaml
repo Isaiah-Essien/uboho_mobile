@@ -34,6 +34,10 @@ dependencies:
   just_audio: ^0.10.4
   geolocator_android: ^5.0.1+1
   geolocator: any
+  cloud_functions: ^5.5.2
+  firebase_app_check: ^0.3.2+7
+  flutter_dotenv: ^5.2.1
+  mailer: ^6.4.1
 
 
 dev_dependencies:
@@ -60,6 +64,7 @@ flutter:
      - assets/african_flags/
      - assets/models/
      - assets/sounds/
+     - .env
 
   fonts:
      - family: Gilmer

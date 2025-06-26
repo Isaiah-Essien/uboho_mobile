@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:uboho/service_backend/seizure_prediction/email_sender.dart';
 
 class SeizureEventHandler {
   static Future<void> handleSeizureEvent() async {
@@ -46,8 +46,8 @@ class SeizureEventHandler {
             (c) => c['isPrimary'] == true,
         orElse: () => {},
       );
-      if (primaryContact.isEmpty || !(primaryContact['email']?.toString().contains('@') ?? false)) {
-        print('Primary emergency contact not found or invalid.');
+      if (primaryContact.isEmpty) {
+        print('❌ Primary emergency contact not found.');
         return;
       }
 
@@ -57,7 +57,7 @@ class SeizureEventHandler {
         permission = await Geolocator.requestPermission();
       }
       if (permission == LocationPermission.deniedForever || permission == LocationPermission.denied) {
-        print('Location permission denied.');
+        print('❌ Location permission denied.');
         return;
       }
 
@@ -79,21 +79,14 @@ class SeizureEventHandler {
         }
       });
 
-      // Step 6: Send mailto to emergency contact
-      final email = Uri(
-        scheme: 'mailto',
-        path: primaryContact['email'],
-        query: Uri.encodeFull(
-          'subject=Seizure Alert&body=Your contact $patientName is experiencing a seizure.\n\nLive location: $mapsLink',
-        ),
+      // Step 6: Send seizure alert email directly from Flutter
+      await EmailSender.sendSeizureAlertEmail(
+        latitude: latitude,
+        longitude: longitude,
+        patientName: patientName,
       );
-      if (await canLaunchUrl(email)) {
-        await launchUrl(email);
-      } else {
-        print('Could not launch email.');
-      }
 
-      // Step 7: Send automatic message to doctor
+      // Step 7: Send automatic message to doctor via chat
       final conversationId = '${patientId}_$adminId';
       final messageText = '🚨 Seizure alert for $patientName\nLive Location: $mapsLink';
       final timestamp = Timestamp.now();
@@ -125,9 +118,38 @@ class SeizureEventHandler {
         'lastMessageTime': timestamp,
         'unreadCount.$adminId': FieldValue.increment(1),
       });
-
     } catch (e) {
-      print('SeizureEventHandler Error: $e');
+      print(' SeizureEventHandler Error: $e');
+    }
+  }
+
+  static Future<void> handleNoSeizureEvent() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final authId = user.uid;
+      final hospitalsSnapshot = await FirebaseFirestore.instance.collection('hospitals').get();
+
+      for (final hospital in hospitalsSnapshot.docs) {
+        final patients = await hospital.reference
+            .collection('patients')
+            .where('authId', isEqualTo: authId)
+            .limit(1)
+            .get();
+
+        if (patients.docs.isNotEmpty) {
+          final patientRef = patients.docs.first.reference;
+          final eventRef = patientRef.collection('seizure_events').doc(DateTime.now().millisecondsSinceEpoch.toString());
+          await eventRef.set({
+            'timestamp': FieldValue.serverTimestamp(),
+            'status': 'no-seizure',
+          });
+          break;
+        }
+      }
+    } catch (e) {
+      print(' handleNoSeizureEvent Error: $e');
     }
   }
 }

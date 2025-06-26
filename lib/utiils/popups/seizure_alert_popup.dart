@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:uboho/utiils/constants/icons.dart';
 import 'package:vibration/vibration.dart';
 import 'package:just_audio/just_audio.dart';
-import '../../../utiils/constants/colors.dart';
-import '../../features/reuseable_widgets/primary_button.dart';
-import '../../../service_backend/seizure_prediction/seizure_event_handler.dart';
+
+import 'package:uboho/utiils/constants/icons.dart';
+import 'package:uboho/utiils/constants/colors.dart';
+import 'package:uboho/features/reuseable_widgets/primary_button.dart';
+import 'package:uboho/service_backend/seizure_prediction/seizure_event_handler.dart';
 
 class SeizureAlertDialog extends StatefulWidget {
   const SeizureAlertDialog({super.key});
@@ -26,8 +28,8 @@ class _SeizureAlertDialogState extends State<SeizureAlertDialog> {
   @override
   void initState() {
     super.initState();
-    _triggerFeedback();
-    _startCountdown();
+    _startCountdown(); // Start countdown right away
+    Future.microtask(() => _triggerFeedback()); // Trigger audio and vibration after UI begins rendering
   }
 
   Future<void> _triggerFeedback() async {
@@ -36,10 +38,14 @@ class _SeizureAlertDialogState extends State<SeizureAlertDialog> {
     }
 
     if (!_hasPlayed) {
+      _hasPlayed = true;
       try {
-        await _player.setAsset('assets/sounds/digital_clock.wav');
-        await _player.play();
-        _hasPlayed = true;
+        // Play audio without awaiting
+        unawaited(
+          _player.setAsset('assets/sounds/digital_clock.wav').then((_) {
+            _player.play();
+          }),
+        );
       } catch (e) {
         debugPrint("Audio play error: $e");
       }
@@ -47,25 +53,27 @@ class _SeizureAlertDialogState extends State<SeizureAlertDialog> {
   }
 
   void _startCountdown() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_countdown == 0) {
         _timer?.cancel();
         if (!_dismissedManually) {
-          await SeizureEventHandler.handleSeizureEvent();
+          SeizureEventHandler.handleSeizureEvent(); // Run async in background
         }
-        if (mounted) Navigator.of(context).pop();
+        if (mounted) Navigator.of(context).pop(); // Close immediately
       } else {
         setState(() => _countdown--);
       }
     });
   }
 
-  void _dismissManually() {
+  void _dismissManually() async {
     _dismissedManually = true;
     _timer?.cancel();
     _player.stop();
     Vibration.cancel();
-    Navigator.of(context).pop();
+
+    await SeizureEventHandler.handleNoSeizureEvent();
+    if (mounted) Navigator.of(context).pop();
   }
 
   @override

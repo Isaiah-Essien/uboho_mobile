@@ -90,14 +90,12 @@ class SeizureMonitorService {
           Vibration.vibrate(pattern: [0, 500, 1000, 500, 1000], intensities: [128, 255, 128]);
         }
 
-        final ctx = _navigatorKey?.currentState?.overlay?.context;
+        final ctx = _navigatorKey?.currentContext;
         if (ctx != null) {
-          showGeneralDialog(
+          showDialog(
             context: ctx,
             barrierDismissible: false,
-            barrierColor: Colors.black.withOpacity(0.3),
-            transitionDuration: const Duration(milliseconds: 200),
-            pageBuilder: (_, __, ___) => const SeizureAlertDialog(),
+            builder: (_) => const SeizureAlertDialog(),
           ).then((_) {
             _alertShown = false;
             Vibration.cancel();
@@ -105,6 +103,8 @@ class SeizureMonitorService {
             motionPeak = 0;
             rotationPeak = 0;
           });
+        } else {
+          debugPrint('❗ Unable to show seizure dialog — context is null.');
         }
       }
     }
