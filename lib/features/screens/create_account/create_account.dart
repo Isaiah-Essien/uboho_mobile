@@ -6,6 +6,7 @@ import 'package:uboho/utiils/constants/text_strings.dart';
 import '../../../service_backend/account_creation/patient_account_creation_controller.dart';
 import '../../../utiils/constants/colors.dart';
 import '../../controllers/create_account_controller.dart';
+import '../../controllers/onboarding_controller.dart';
 import '../../reuseable_widgets/custom_input.dart';
 import '../../reuseable_widgets/long_line_footer.dart';
 import '../../reuseable_widgets/onboarding_title_subtitle.dart';
@@ -48,8 +49,11 @@ class CreateAccountScreen extends StatelessWidget {
                           child: IconButton(
                             icon: const Icon(Icons.chevron_left, color: Colors.white),
                             onPressed: () {
+                              final onboardingController = Get.find<OnboardingController>();
+                              onboardingController.resetToFirstPage();
                               Get.offAll(() => OnboardingScreen());
                             },
+
                           ),
                         ),
                       ),

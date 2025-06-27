@@ -19,6 +19,11 @@ class OnboardingController extends GetxController {
   }
 
   void skipToLast() {
-    pageController.jumpToPage(2); // assuming 3 screens
+    pageController.jumpToPage(2);
+  }
+
+  void resetToFirstPage() {
+    currentIndex.value = 0;
+    pageController.jumpToPage(0);
   }
 }

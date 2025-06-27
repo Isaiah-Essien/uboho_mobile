@@ -1,3 +1,5 @@
+// HomeScreen.dart
+
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -156,12 +158,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final motionPeak = motionPoints.isEmpty
-        ? "--"
-        : motionPoints.map((e) => e.y).reduce(max).toStringAsFixed(1);
-    final rotationPeak = rotationPoints.isEmpty
-        ? "--"
-        : rotationPoints.map((e) => e.y).reduce(max).toStringAsFixed(1);
+    final motionPeakValue =
+    motionPoints.isEmpty ? 0 : motionPoints.map((e) => e.y).reduce(max);
+    final rotationPeakValue =
+    rotationPoints.isEmpty ? 0 : rotationPoints.map((e) => e.y).reduce(max);
+
+    final motionPeak = motionPeakValue.toStringAsFixed(1);
+    final rotationPeak = rotationPeakValue.toStringAsFixed(1);
+
+    final isUnstable = motionPeakValue >= 20 && rotationPeakValue >= 3;
 
     return Scaffold(
       backgroundColor: UColors.backgroundColor,
@@ -267,23 +272,28 @@ class _HomeScreenState extends State<HomeScreen> {
                             border: Border.all(
                                 color: UColors.footerWithTextDividerColor),
                           ),
-                          child: SvgPicture.asset(UIcons.noteIcon),
+                          child: SvgPicture.asset(
+                            UIcons.noteIcon,
+                            color: isUnstable ? Colors.redAccent : UColors.primaryColor,
+                          ),
                         ),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Stable",
-                                style: TextStyle(
+                                isUnstable ? "Unstable" : "Stable",
+                                style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w600),
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text(
-                                "Your motion intensity and rotation activity levels are normal.",
-                                style: TextStyle(
+                                isUnstable
+                                    ? "Unusual motion and rotation patterns detected."
+                                    : "Your motion intensity and rotation activity levels are normal.",
+                                style: const TextStyle(
                                     color: Colors.white70, fontSize: 12),
                               ),
                             ],

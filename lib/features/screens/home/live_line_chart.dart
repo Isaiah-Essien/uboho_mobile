@@ -25,13 +25,22 @@ class LiveLineChart extends StatelessWidget {
     // Find the peak point (y max)
     final FlSpot peak = dataPoints.reduce((a, b) => a.y > b.y ? a : b);
 
+    // Determine X range: ensure line stays within bounds of the container
+    final double minX = dataPoints.first.x;
+    final double maxX = dataPoints.last.x;
+
+    // Determine Y range: dynamic maxY for padding
+    final double maxY = dataPoints.map((e) => e.y).reduce((a, b) => a > b ? a : b) + 5;
+
     return LineChart(
       LineChartData(
         gridData: FlGridData(show: false),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(show: false),
+        minX: minX,
+        maxX: maxX,
         minY: 0,
-        maxY: dataPoints.map((e) => e.y).reduce((a, b) => a > b ? a : b) + 5,
+        maxY: maxY,
         lineBarsData: [
           LineChartBarData(
             spots: dataPoints,
@@ -42,17 +51,16 @@ class LiveLineChart extends StatelessWidget {
             dotData: FlDotData(
               show: true,
               getDotPainter: (spot, percent, barData, index) {
-                // Peak only
+                // Peak point gets a dot
                 if (spot == peak) {
                   return FlDotCirclePainter(
                     radius: 4,
                     color: lineColor,
                     strokeColor: Colors.black,
-                    strokeWidth: 1.5,
+                    strokeWidth: 1,
                   );
                 }
-
-                // Return invisible painter for other points
+                // Invisible dots for others
                 return FlDotCirclePainter(
                   radius: 0,
                   color: Colors.transparent,
@@ -61,8 +69,6 @@ class LiveLineChart extends StatelessWidget {
                 );
               },
             ),
-
-
           ),
         ],
       ),

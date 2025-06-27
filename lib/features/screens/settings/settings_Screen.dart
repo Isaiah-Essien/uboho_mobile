@@ -11,6 +11,7 @@ import 'package:uboho/features/screens/settings/personal_info.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 
 import '../../../service_backend/settiings_logics/profile_picture_service.dart';
+import '../../../utiils/popups/logout_confirmation.dart';
 import '../onboarding/onboarding_screen.dart';
 import 'about_uboho.dart';
 import 'medical_info.dart';
@@ -175,9 +176,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
-                      Get.offAll(() => OnboardingScreen());
+                    onPressed: () {
+                      showLogoutConfirmationPopup(context);
                     },
                     icon: const Icon(LucideIcons.logOut, color: Colors.white),
                     label: const Text("Logout", style: TextStyle(color: Colors.white)),

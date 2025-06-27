@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fl_chart/fl_chart.dart'; // Required for FlSpot
+import 'package:fl_chart/fl_chart.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 import 'package:uboho/utiils/constants/icons.dart';
 
-import 'live_line_chart.dart'; // Update this path if different
+import 'live_line_chart.dart';
 
 class MetricCard extends StatefulWidget {
   final String title;
@@ -56,10 +56,8 @@ class _MetricCardState extends State<MetricCard> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-
-              // Refined Dropdown Styling
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4.72),
                   border: Border.all(
@@ -81,7 +79,11 @@ class _MetricCardState extends State<MetricCard> {
                         fit: BoxFit.contain,
                       ),
                     ),
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w400),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                    ),
                     onChanged: (value) {
                       setState(() => selectedRange = value!);
                     },
@@ -109,40 +111,48 @@ class _MetricCardState extends State<MetricCard> {
 
           const SizedBox(height: 12),
 
-          // Live Line Chart
-          Container(
-            height: 100,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              gradient: LinearGradient(
-                colors: [widget.lineColor.withOpacity(0.2), Colors.transparent],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
+          // Chart Container with Clipping
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              height: 100,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [widget.lineColor.withOpacity(0.2), Colors.transparent],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                ),
               ),
-            ),
-            child: widget.dataPoints.isEmpty
-                ? const Center(
-              child: Text(
-                "(Collecting...)",
-                style: TextStyle(color: Colors.white24),
+              child: widget.dataPoints.isEmpty
+                  ? const Center(
+                child: Text(
+                  "(Collecting...)",
+                  style: TextStyle(color: Colors.white24),
+                ),
+              )
+                  : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: LiveLineChart(
+                  dataPoints: widget.dataPoints,
+                  lineColor: widget.lineColor,
+                ),
               ),
-            )
-                : LiveLineChart(
-              dataPoints: widget.dataPoints,
-              lineColor: widget.lineColor,
             ),
           ),
 
           const SizedBox(height: 12),
 
-          // Daily Peak Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Daily Peak", style: TextStyle(color: Colors.white, fontSize: 12)),
+                  const Text(
+                    "Daily Peak",
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
                   const SizedBox(height: 2),
                   Text(
                     widget.dailyPeak,
