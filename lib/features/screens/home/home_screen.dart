@@ -37,8 +37,27 @@ class _HomeScreenState extends State<HomeScreen> {
   String patientName = '';
   String patientId = '';
   String? profileImageUrl;
-
   final ProfileImageService _imageService = ProfileImageService();
+
+  Future<DocumentReference?> _getPatientDocRef() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return null;
+
+    final hospitals = await FirebaseFirestore.instance.collection('hospitals').get();
+    for (final hospital in hospitals.docs) {
+      final patients = await hospital.reference
+          .collection('patients')
+          .where('authId', isEqualTo: uid)
+          .limit(1)
+          .get();
+
+      if (patients.docs.isNotEmpty) {
+        return patients.docs.first.reference;
+      }
+    }
+
+    return null;
+  }
 
   @override
   void initState() {
@@ -223,26 +242,58 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => NotificationCenterScreen()),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.1),
-                              border: Border.all(
-                                  color: Colors.white.withOpacity(0.15)),
+                        // Notification icon with persistent UI and live unread badge
+                        Stack(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const NotificationCenterScreen()),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.1),
+                                  border: Border.all(color: Colors.white.withOpacity(0.15)),
+                                ),
+                                child: const Icon(Icons.notifications, color: Colors.white, size: 18),
+                              ),
                             ),
-                            child: const Icon(Icons.notifications,
-                                color: Colors.white, size: 18),
-                          ),
-                        )
+
+                            // Unread badge (separate logic, overlays dot without delaying icon)
+                            FutureBuilder<DocumentReference?>(
+                              future: _getPatientDocRef(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) return const SizedBox.shrink();
+
+                                final ref = snapshot.data!;
+                                return StreamBuilder<QuerySnapshot>(
+                                  stream: ref
+                                      .collection('notifications')
+                                      .where('isRead', isEqualTo: false)
+                                      .limit(1)
+                                      .snapshots(),
+                                  builder: (context, snap) {
+                                    final hasUnread = snap.hasData && snap.data!.docs.isNotEmpty;
+                                    if (!hasUnread) return const SizedBox.shrink();
+
+                                    return const Positioned(
+                                      right: 4,
+                                      top: 4,
+                                      child: CircleAvatar(
+                                        radius: 4,
+                                        backgroundColor: UColors.primaryColor,
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -252,8 +303,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   left: 20,
                   right: 20,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
                       color: UColors.boxHighlightColor,
                       borderRadius: BorderRadius.circular(20),
@@ -274,7 +325,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: SvgPicture.asset(
                             UIcons.noteIcon,
-                            color: isUnstable ? Colors.redAccent : UColors.primaryColor,
+                            color:
+                            isUnstable ? Colors.redAccent : UColors.primaryColor,
                           ),
                         ),
                         const SizedBox(width: 12),

@@ -7,6 +7,7 @@ import 'app.dart';
 import 'features/controllers/onboarding_controller.dart';
 import 'firebase_options.dart';
 
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {

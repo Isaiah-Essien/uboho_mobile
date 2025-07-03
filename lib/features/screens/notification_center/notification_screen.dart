@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 import '../../../service_backend/settiings_logics/notification_service.dart';
+import '../../../utiils/device/notification_navigator.dart';
 import 'notification_card.dart';
 import 'package:intl/intl.dart';
 
@@ -115,7 +116,10 @@ class NotificationCenterScreen extends StatelessWidget {
                             return NotificationCard(
                               message: doc['message'],
                               time: DateFormat('MMM d, h:mm a').format(time),
-                              onTap: () => Get.toNamed('/${doc['route']}'),
+                              onTap: () => NotificationNavigator.navigateFromNotification(
+                                route: doc['route'],
+                                arguments: doc['arguments'],
+                              ),
                             );
                           }).toList(),
                         ),

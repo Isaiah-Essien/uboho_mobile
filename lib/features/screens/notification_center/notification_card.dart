@@ -6,7 +6,7 @@ class NotificationCard extends StatelessWidget {
   final String message;
   final String time;
   final bool isUnread;
-  final VoidCallback? onTap; // Add this to enable navigation or tap action
+  final VoidCallback? onTap;
 
   const NotificationCard({
     Key? key,
@@ -19,7 +19,7 @@ class NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap, // Call navigation or read update when tapped
+      onTap: onTap, // Navigation or update logic
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.all(12),
@@ -46,17 +46,33 @@ class NotificationCard extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
-            // Message & Time
+            // Message and Time
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    message,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          message,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      if (isUnread)
+                        Container(
+                          margin: const EdgeInsets.only(left: 6, top: 2),
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: UColors.primaryColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(

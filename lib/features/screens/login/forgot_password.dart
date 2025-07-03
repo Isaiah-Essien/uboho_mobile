@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uboho/utiils/constants/text_strings.dart';
 
+import '../../../service_backend/account_login/password_reset_service.dart';
 import '../../../utiils/constants/colors.dart';
 import '../../reuseable_widgets/onboarding_title_subtitle.dart';
 import '../../reuseable_widgets/custom_input.dart';
 import '../../reuseable_widgets/primary_button.dart';
-import 'otp_screen.dart';
+import '../login/login.dart';
 
 class ForgotPassword extends StatelessWidget {
   const ForgotPassword({super.key});
@@ -14,7 +15,8 @@ class ForgotPassword extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController idOrEmailController = TextEditingController();
-    final GlobalKey<CustomInputFieldState> emailKey = GlobalKey<CustomInputFieldState>();
+    final GlobalKey<CustomInputFieldState> emailKey =
+    GlobalKey<CustomInputFieldState>();
 
     return Scaffold(
       backgroundColor: UColors.backgroundColor,
@@ -38,40 +40,104 @@ class ForgotPassword extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.chevron_left, color: Colors.white),
+                            icon: const Icon(Icons.chevron_left,
+                                color: Colors.white),
                             onPressed: () => Get.back(),
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 20),
-
                       OnboardingTitleSubtitle(
                         title: UTexts.verifyScreenTitle,
                         subtitle: UTexts.verifyScreenSubTitle,
                       ),
-
                       const SizedBox(height: 32),
-
                       CustomInputField(
                         key: emailKey,
                         hintText: 'Patient ID or Email',
                         controller: idOrEmailController,
-                        validationType: InputValidationType.email,
+                        validationType: InputValidationType.none,
                       ),
-
                       const SizedBox(height: 24),
-
                       PrimaryButton(
                         text: 'Submit',
-                        onPressed: () {
+                        onPressed: () async {
                           if (!emailKey.currentState!.validate()) return;
+                          final input = idOrEmailController.text.trim();
 
-                          final email = idOrEmailController.text.trim();
-                          Get.to(() => OtpScreen(email: email));
+                          try {
+                            final resetEmail =
+                            await PasswordResetService.sendResetEmail(
+                                input);
+
+                            // Custom-styled dialog
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) {
+                                return Dialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16)),
+                                  backgroundColor: UColors.boxHighlightColor,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24, vertical: 32),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Text(
+                                          'Reset Link Sent!',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          'A password reset link has been sent to:\n$resetEmail',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 24),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                            UColors.primaryColor,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                            ),
+                                            minimumSize:
+                                            const Size.fromHeight(45),
+                                          ),
+                                          onPressed: () {
+                                            Get.offAll(() =>
+                                            const LoginScreen());
+                                          },
+                                          child: const Text(
+                                            'Go to Login',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          } catch (e) {
+                            Get.snackbar('Error', e.toString(),
+                                snackPosition: SnackPosition.BOTTOM);
+                          }
                         },
                       ),
-
                       const Spacer(),
                       const SizedBox(height: 16),
                     ],

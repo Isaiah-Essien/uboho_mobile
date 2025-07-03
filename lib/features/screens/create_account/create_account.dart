@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:uboho/features/screens/onboarding/onboarding_screen.dart';
 import 'package:uboho/utiils/constants/text_strings.dart';
 
@@ -53,7 +54,6 @@ class CreateAccountScreen extends StatelessWidget {
                               onboardingController.resetToFirstPage();
                               Get.offAll(() => OnboardingScreen());
                             },
-
                           ),
                         ),
                       ),
@@ -72,9 +72,7 @@ class CreateAccountScreen extends StatelessWidget {
                           key: hospitalKey,
                           hintText: 'Select Hospital/organization',
                           isDropdown: true,
-                          dropdownItems: controller.hospitals.isEmpty
-                              ? []
-                              : controller.hospitals,
+                          dropdownItems: controller.hospitals,
                           selectedItem: controller.selectedDropdownItem.value,
                           onDropdownChanged: (value) {
                             controller.selectDropdownItem(value);
@@ -148,8 +146,75 @@ class CreateAccountScreen extends StatelessWidget {
                       FooterText(
                         fullText: 'Read our Privacy Policy and Terms & Conditions',
                         links: {
-                          'Privacy Policy': () {},
-                          'Terms & Conditions': () {},
+                          'Privacy Policy': () async {
+                            await showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              useRootNavigator: true,
+                              backgroundColor: Colors.black,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                              ),
+                              builder: (context) {
+                                return DraggableScrollableSheet(
+                                  expand: false,
+                                  initialChildSize: 0.85,
+                                  maxChildSize: 0.95,
+                                  minChildSize: 0.6,
+                                  builder: (_, scrollController) {
+                                    return Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                          child: Row(
+                                            children: [
+                                              const Text(
+                                                "Privacy Policy",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              IconButton(
+                                                icon: const Icon(Icons.close, color: Colors.white),
+                                                onPressed: () => Navigator.pop(context),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Divider(color: Colors.white24, height: 1),
+                                        Expanded(
+                                          child: SfPdfViewer.asset(
+                                            'assets/docs/Uboho_app_privacy_ethics_docs.pdf',
+                                            canShowScrollHead: false,
+                                            canShowScrollStatus: false,
+                                            onDocumentLoaded: (details) {
+                                              debugPrint('PDF loaded successfully');
+                                            },
+                                            onDocumentLoadFailed: (details) {
+                                              debugPrint('PDF load failed: ${details.description}');
+                                              Get.snackbar(
+                                                'Error',
+                                                'Failed to load privacy document',
+                                                backgroundColor: Colors.red,
+                                                colorText: Colors.white,
+                                                snackPosition: SnackPosition.BOTTOM,
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          'Terms & Conditions': () {
+                            // Future: Add your terms logic
+                          },
                         },
                       ),
 

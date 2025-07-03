@@ -28,6 +28,11 @@ class CreateAccountController extends GetxController {
           .toList();
 
       hospitals.assignAll(names);
+
+      // Set default selection if not already chosen
+      if (names.isNotEmpty) {
+        selectedDropdownItem.value ??= names.first;
+      }
     } catch (e) {
       print('Error fetching hospitals: $e');
     }

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Background color for splash screen -->
+    <color name="surface_color">#111111</color>
+</resources>

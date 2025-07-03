@@ -1,33 +1,43 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:uboho/features/screens/settings/emergency_contact.dart';
-import 'package:uboho/features/screens/settings/medical_info.dart';
-import 'package:uboho/features/screens/settings/add_emergency_contact.dart';
-
+import 'package:flutter/material.dart';
+import '../../features/screens/settings/emergency_contact.dart';
+import '../../features/screens/settings/medical_info.dart';
+import '../../features/screens/settings/add_emergency_contact.dart';
 import '../../features/screens/settings/settings_Screen.dart';
 
 class NotificationNavigator {
-  static void navigateToTarget(String screen, {Map<String, dynamic>? arguments}) {
-    switch (screen) {
-      case 'SettingsScreen':
-        Get.to(() => const SettingsScreen(), arguments: arguments);
-        break;
+  static void navigateFromNotification({
+    required String route,
+    Map<String, dynamic>? arguments,
+  }) {
+    Widget? targetScreen;
 
-      case 'EmergencyContactScreen':
-        Get.to(() => EmergencyContactScreen(), arguments: arguments);
+    switch (route) {
+      case 'settings':
+        targetScreen = const SettingsScreen();
         break;
-
-      case 'MedicalInformationScreen':
-        Get.to(() => const MedicalInformationScreen(), arguments: arguments);
+      case 'emergency-contact':
+        targetScreen = const EmergencyContactScreen();
         break;
-
-      case 'AddEmergencyContactScreen':
-        Get.to(() => const AddEmergencyContactScreen(), arguments: arguments);
+      case 'medical-info':
+        targetScreen = const MedicalInformationScreen();
         break;
-
+      case 'add-emergency-contact':
+        targetScreen = const AddEmergencyContactScreen();
+        break;
       default:
-        debugPrint('Unknown target screen: $screen');
-        break;
+        Get.snackbar(
+          'Navigation Error',
+          'Unknown destination: $route',
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+        return;
+    }
+
+    if (targetScreen != null) {
+      Get.to(() => targetScreen, arguments: arguments);
     }
   }
 }
