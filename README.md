@@ -8,11 +8,12 @@
 ---
 
 ## Relevant Links
-- [Watch Demo of the Front end and Initial Set up](https://drive.google.com/file/d/1Y4XGzpOYjPDC3eEgaZ9sZ6qHwTNWMSwX/view?usp=sharing)
-- [APK file](https://drive.google.com/file/d/1X-Jkno1MoEbwFLt8oQcU3e9K9mqQwa1X/view?usp=drive_link)
+- [Final Demo_video](https://drive.google.com/file/d/1XLzOHM6Bv0CMiRLJ8UZinhGnnOnriDTX/view?usp=drive_link)
+- [APK file](https://drive.google.com/file/d/1P6c8OTIzJb-7oPbrxBC6F3g80XjQEwq8/view?usp=drive_link)
 - [figma design](https://www.figma.com/design/EjFiGZ5k5acmHJRQBd7kbL/Uboho?node-id=0-1&t=KELwLbz414nI3asK-1)
 - [Model Notebook](https://colab.research.google.com/drive/1A0p8y6ESvFTNLna3j7ZdFADVQKIYOiaY?usp=sharing)
 - [Link to repo](https://github.com/Isaiah-Essien/uboho_mobile)
+- [Link to result Analysis](https://docs.google.com/document/d/1VcpaDektwOJMmtjM2LOTRAUTh_5AqvCrXtK0OyX-ykY/edit?usp=sharing)
 
 ---
 ## What Uboho Does
@@ -45,16 +46,22 @@ Uboho is a mobile companion that combines artificial intelligence and continuous
 ## Screenshots & Demos
 
 ### Real-Time Motion Monitoring
-![Motion Chart](assets/images/app_screenshots/IMG-20250603-WA0101.jpg)
+![Motion Chart](assets/images/app_screenshots/graphs.jpg)
 
 ### AI Seizure Detection
-![Seizure Alert GIF](assets/gifs/seizure_detected_animation.gif)
+![Seizure Alert GIF](assets/images/app_screenshots/seizure_event_detected.jpg)
 
 ### Emergency Location Sharing
-![Location Screenshot](assets/screenshots/location_share_placeholder.png)
+![Location Screenshot](assets/images/app_screenshots/location_real_time.png)
 
 ### Patient–Doctor Chat
-![Chat Interface](assets/images/app_screenshots/IMG-20250603-WA0099.jpg)
+![Chat Interface](assets/images/app_screenshots/chat.jpg)
+
+### Notifications
+![Chat Interface](assets/images/app_screenshots/notifications.jpg)
+
+### Patient Invitataion
+![Patient's Invitation Email](assets/images/app_screenshots/patient_invidation.png)
 
 ---
 

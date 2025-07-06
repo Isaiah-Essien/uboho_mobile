@@ -37,3 +37,33 @@ class NotificationService {
     await ref.update({'isRead': true});
   }
 }
+
+//Notification Trigger for High Peak
+class SensorNotificationTrigger {
+  static bool _motionNotified = false;
+  static bool _rotationNotified = false;
+
+  static Future<void> checkAndNotify({required double motion, required double rotation}) async {
+    if (motion >= 27 && !_motionNotified) {
+      await NotificationService.sendNotification(
+        message: '⚠️ High motion intensity detected!',
+        route: 'HomeScreen',
+        type: 'motion',
+      );
+      _motionNotified = true;
+    }
+
+    if (rotation >= 15 && !_rotationNotified) {
+      await NotificationService.sendNotification(
+        message: '⚠️ High rotation activity detected!',
+        route: 'HomeScreen',
+        type: 'rotation',
+      );
+      _rotationNotified = true;
+    }
+
+    // Reset flags if values normalize
+    if (motion < 20) _motionNotified = false;
+    if (rotation < 10) _rotationNotified = false;
+  }
+}

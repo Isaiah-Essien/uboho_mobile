@@ -9,15 +9,22 @@ import '../../reuseable_widgets/custom_input.dart';
 import '../../reuseable_widgets/primary_button.dart';
 import '../login/login.dart';
 
-class ForgotPassword extends StatelessWidget {
+class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController idOrEmailController = TextEditingController();
-    final GlobalKey<CustomInputFieldState> emailKey =
-    GlobalKey<CustomInputFieldState>();
+  State<ForgotPassword> createState() => _ForgotPasswordState();
+}
 
+class _ForgotPasswordState extends State<ForgotPassword> {
+  final TextEditingController idOrEmailController = TextEditingController();
+  final GlobalKey<CustomInputFieldState> emailKey =
+  GlobalKey<CustomInputFieldState>();
+
+  bool isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: UColors.backgroundColor,
       body: SafeArea(
@@ -59,26 +66,39 @@ class ForgotPassword extends StatelessWidget {
                         validationType: InputValidationType.none,
                       ),
                       const SizedBox(height: 24),
-                      PrimaryButton(
+                      isLoading
+                          ? const Center(
+                        child: CircularProgressIndicator(
+                          color: UColors.primaryColor,
+                        ),
+                      )
+                          : PrimaryButton(
                         text: 'Submit',
                         onPressed: () async {
                           if (!emailKey.currentState!.validate()) return;
+
                           final input = idOrEmailController.text.trim();
+
+                          setState(() => isLoading = true);
 
                           try {
                             final resetEmail =
                             await PasswordResetService.sendResetEmail(
                                 input);
 
-                            // Custom-styled dialog
+                            setState(() => isLoading = false);
+
                             showDialog(
                               context: context,
                               barrierDismissible: false,
                               builder: (context) {
                                 return Dialog(
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16)),
-                                  backgroundColor: UColors.boxHighlightColor,
+                                    borderRadius:
+                                    BorderRadius.circular(16),
+                                  ),
+                                  backgroundColor:
+                                  UColors.boxHighlightColor,
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 24, vertical: 32),
@@ -95,7 +115,7 @@ class ForgotPassword extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 16),
                                         Text(
-                                          'A password reset link has been sent to:\n$resetEmail',
+                                          'Check Your Email: A password reset link has been sent to:\n$resetEmail',
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(
                                             color: Colors.white,
@@ -109,7 +129,8 @@ class ForgotPassword extends StatelessWidget {
                                             UColors.primaryColor,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                              BorderRadius.circular(10),
+                                              BorderRadius.circular(
+                                                  10),
                                             ),
                                             minimumSize:
                                             const Size.fromHeight(45),
@@ -133,8 +154,12 @@ class ForgotPassword extends StatelessWidget {
                               },
                             );
                           } catch (e) {
-                            Get.snackbar('Error', e.toString(),
-                                snackPosition: SnackPosition.BOTTOM);
+                            setState(() => isLoading = false);
+                            Get.snackbar(
+                              'Error',
+                              e.toString(),
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
                           }
                         },
                       ),

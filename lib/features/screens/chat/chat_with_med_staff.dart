@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 import 'package:uboho/utiils/constants/icons.dart';
 import 'package:uboho/service_backend/settiings_logics/profile_picture_service.dart';
+import '../../../service_backend/settiings_logics/notification_service.dart';
 
 class ChatWithMedicalStaffScreen extends StatefulWidget {
   const ChatWithMedicalStaffScreen({super.key});
@@ -36,7 +37,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
   void initState() {
     super.initState();
     _loadProfileImage();
-    _initializeChat();
+    _initializeChat(); // Calls everything once hospitalId is initialized
   }
 
   Future<void> _loadProfileImage() async {
@@ -54,13 +55,11 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
     }
 
     final uid = currentUser.uid;
-
     final hospitalsSnap = await FirebaseFirestore.instance.collection('hospitals').get();
 
     for (final hospitalDoc in hospitalsSnap.docs) {
       final hospitalRef = hospitalDoc.reference;
 
-      // Step 1: Look for the patient using authId
       final patientSnap = await hospitalRef
           .collection('patients')
           .where('authId', isEqualTo: uid)
@@ -69,20 +68,18 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
 
       if (patientSnap.docs.isEmpty) continue;
 
-      // Patient is found in this hospital
       final patientDoc = patientSnap.docs.first;
 
       hospitalId = hospitalRef.id;
       patientId = patientDoc.id;
       patientName = patientDoc['name'] ?? '';
-      adminId = patientDoc['createdBy']; // THIS is the admin
+      adminId = patientDoc['createdBy'];
       conversationId = '${patientId}_$adminId';
 
       final conversationRef = hospitalRef.collection('conversations').doc(conversationId);
       final conversationDoc = await conversationRef.get();
 
       if (!conversationDoc.exists) {
-        // New user: create conversation for the first time
         await conversationRef.set({
           'participants': [patientId, adminId],
           'lastMessage': '',
@@ -93,20 +90,50 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
           }
         });
       } else {
-        // Existing conversation: clear unread count
         await conversationRef.update({'unreadCount.$patientId': 0});
       }
+
+      // 🔁 Only now we call the listener
+      listenForIncomingMessages(
+        hospitalId: hospitalId,
+        patientId: patientId,
+        adminId: adminId,
+      );
 
       setState(() => _isLoading = false);
       return;
     }
 
-    // Patient not found in any hospital
     debugPrint('Patient not found in any hospital');
     setState(() => _isLoading = false);
   }
 
+  void listenForIncomingMessages({
+    required String hospitalId,
+    required String patientId,
+    required String adminId,
+  }) {
+    final conversationId = '${patientId}_$adminId';
+    final messagesRef = FirebaseFirestore.instance
+        .collection('hospitals')
+        .doc(hospitalId)
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('messages');
 
+    messagesRef.orderBy('timestamp', descending: true).limit(1).snapshots().listen((snapshot) async {
+      if (snapshot.docs.isEmpty) return;
+      final message = snapshot.docs.first.data();
+
+      if (message['senderId'] != patientId) {
+        await NotificationService.sendNotification(
+          message: 'New message from your doctor: ${message['text']}',
+          type: 'chat',
+          route: 'ChatWithMedicalStaffScreen',
+        );
+      }
+    });
+  }
 
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
@@ -188,7 +215,6 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                 ],
               ),
             ),
-
             if (_isLoading)
               const Expanded(child: Center(child: CircularProgressIndicator()))
             else
@@ -280,10 +306,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                   },
                 ),
               ),
-
             const SizedBox(height: 20),
-
-            // Message input
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Container(
@@ -309,7 +332,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
                     ),
                     IconButton(
                       icon: const Icon(LucideIcons.paperclip, color: UColors.inputInactiveColor),
-                      onPressed: () {}, // Still empty unless used for file support later
+                      onPressed: () {},
                     ),
                     const SizedBox(width: 6),
                     IconButton(

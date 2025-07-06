@@ -55,77 +55,70 @@ class NotificationCenterScreen extends StatelessWidget {
                 final unread = all.where((doc) => !(doc['isRead'] ?? false)).toList();
                 final read = all.where((doc) => doc['isRead'] ?? false).toList();
 
-                return Padding(
+                return ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Top bar
-                      Row(
-                        children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: UColors.boxHighlightColor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              icon: const Icon(Icons.chevron_left, color: Colors.white),
-                              onPressed: () => Get.back(),
-                            ),
+                  children: [
+                    // Top bar
+                    Row(
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: UColors.boxHighlightColor,
+                            shape: BoxShape.circle,
                           ),
-                          const SizedBox(width: 8),
-                          const Expanded(
-                            child: Text(
-                              "Notification",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                          child: IconButton(
+                            icon: const Icon(Icons.chevron_left, color: Colors.white),
+                            onPressed: () => Get.back(),
                           ),
-                          const SizedBox(width: 58),
-                        ],
-                      ),
-
-                      const SizedBox(height: 28),
-                      const Text("Unread", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 12),
-
-                      ...unread.map((doc) {
-                        final time = (doc['timestamp'] as Timestamp).toDate();
-                        return NotificationCard(
-                          message: doc['message'],
-                          time: DateFormat('MMM d, h:mm a').format(time),
-                          isUnread: true,
-                          onTap: () {
-                            NotificationService.markAsRead(doc.reference);
-                            Get.toNamed('/${doc['route']}');
-                          },
-                        );
-                      }),
-
-                      const SizedBox(height: 20),
-                      const Text("Read", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 12),
-
-                      Expanded(
-                        child: ListView(
-                          children: read.map((doc) {
-                            final time = (doc['timestamp'] as Timestamp).toDate();
-                            return NotificationCard(
-                              message: doc['message'],
-                              time: DateFormat('MMM d, h:mm a').format(time),
-                              onTap: () => NotificationNavigator.navigateFromNotification(
-                                route: doc['route'],
-                                arguments: doc['arguments'],
-                              ),
-                            );
-                          }).toList(),
                         ),
-                      )
-                    ],
-                  ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            "Notification",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 58),
+                      ],
+                    ),
+
+                    const SizedBox(height: 28),
+                    const Text("Unread", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 12),
+
+                    ...unread.map((doc) {
+                      final time = (doc['timestamp'] as Timestamp).toDate();
+                      return NotificationCard(
+                        message: doc['message'],
+                        time: DateFormat('MMM d, h:mm a').format(time),
+                        isUnread: true,
+                        onTap: () {
+                          NotificationService.markAsRead(doc.reference);
+                          Get.toNamed('/${doc['route']}');
+                        },
+                      );
+                    }),
+
+                    const SizedBox(height: 20),
+                    const Text("Read", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 12),
+
+                    ...read.map((doc) {
+                      final time = (doc['timestamp'] as Timestamp).toDate();
+                      return NotificationCard(
+                        message: doc['message'],
+                        time: DateFormat('MMM d, h:mm a').format(time),
+                        onTap: () => NotificationNavigator.navigateFromNotification(
+                          route: doc['route'],
+                          arguments: doc['arguments'],
+                        ),
+                      );
+                    }),
+                  ],
                 );
               },
             );
@@ -134,4 +127,5 @@ class NotificationCenterScreen extends StatelessWidget {
       ),
     );
   }
+
 }

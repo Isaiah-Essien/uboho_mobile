@@ -12,6 +12,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:uboho/features/screens/notification_center/notification_screen.dart';
 import 'package:uboho/utiils/constants/colors.dart';
 import 'package:uboho/utiils/constants/icons.dart';
+import '../../../service_backend/settiings_logics/notification_service.dart';
 import '../../../service_backend/settiings_logics/profile_picture_service.dart';
 import 'activity_card.dart';
 
@@ -181,6 +182,12 @@ class _HomeScreenState extends State<HomeScreen> {
     motionPoints.isEmpty ? 0 : motionPoints.map((e) => e.y).reduce(max);
     final rotationPeakValue =
     rotationPoints.isEmpty ? 0 : rotationPoints.map((e) => e.y).reduce(max);
+
+    SensorNotificationTrigger.checkAndNotify(
+      motion: motionPeakValue.toDouble(),
+      rotation: rotationPeakValue.toDouble(),
+    );
+
 
     final motionPeak = motionPeakValue.toStringAsFixed(1);
     final rotationPeak = rotationPeakValue.toStringAsFixed(1);
