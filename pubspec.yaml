@@ -43,6 +43,8 @@ dependencies:
   permission_handler: ^12.0.0+1
   syncfusion_flutter_pdfviewer: ^30.1.37
   http: ^1.4.0
+  mockito: ^5.4.6
+  build_runner: ^2.5.4
 
 
 dev_dependencies:
