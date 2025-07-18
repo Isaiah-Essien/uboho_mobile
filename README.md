@@ -22,6 +22,7 @@
 
 Uboho is a mobile companion that combines artificial intelligence and continuous monitoring to detect possible epileptic seizures and provide timely intervention.
 
+
 - Real-time motion and rotation tracking using accelerometer and gyroscope sensors
 - Live chart visualization of motion intensity and rotation activity
 - On-device seizure detection powered by a machine learning model
