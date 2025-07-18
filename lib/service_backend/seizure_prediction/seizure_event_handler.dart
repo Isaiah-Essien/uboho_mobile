@@ -47,7 +47,7 @@ class SeizureEventHandler {
         orElse: () => {},
       );
       if (primaryContact.isEmpty) {
-        print('❌ Primary emergency contact not found.');
+        print(' Primary emergency contact not found.');
         return;
       }
 
@@ -57,7 +57,7 @@ class SeizureEventHandler {
         permission = await Geolocator.requestPermission();
       }
       if (permission == LocationPermission.deniedForever || permission == LocationPermission.denied) {
-        print('❌ Location permission denied.');
+        print(' Location permission denied.');
         return;
       }
 
@@ -87,13 +87,42 @@ class SeizureEventHandler {
       );
 
       // Step 7: Send automatic message to doctor via chat
-      final conversationId = '${patientId}_$adminId';
+      // UPDATED: Find the unique conversationId by matching participants
+      final hospitalRef = FirebaseFirestore.instance.collection('hospitals').doc(hospitalId);
+      final conversationsQuery = await hospitalRef
+          .collection('conversations')
+          .where('participants', arrayContainsAny: [patientId, adminId])
+          .get();
+
+      String? conversationId;
+      for (final doc in conversationsQuery.docs) {
+        final participants = List<String>.from(doc['participants'] ?? []);
+        if (participants.contains(patientId) && participants.contains(adminId)) {
+          conversationId = doc.id;
+          await doc.reference.update({'unreadCount.$patientId': 0});
+          break;
+        }
+      }
+
+      if (conversationId == null) {
+        final newConvoRef = hospitalRef.collection('conversations').doc();
+        await newConvoRef.set({
+          'participants': [patientId, adminId],
+          'lastMessage': '',
+          'lastMessageTime': Timestamp.now(),
+          'unreadCount': {
+            patientId: 0,
+            adminId: 0,
+          },
+          'createdAt': Timestamp.now(),
+        });
+        conversationId = newConvoRef.id;
+      }
+
       final messageText = '🚨 Seizure alert for $patientName\nLive Location: $mapsLink';
       final timestamp = Timestamp.now();
 
-      final messageRef = FirebaseFirestore.instance
-          .collection('hospitals')
-          .doc(hospitalId)
+      final messageRef = hospitalRef
           .collection('conversations')
           .doc(conversationId)
           .collection('messages')
@@ -107,13 +136,10 @@ class SeizureEventHandler {
         'type': 'text',
       });
 
-      final convoRef = FirebaseFirestore.instance
-          .collection('hospitals')
-          .doc(hospitalId)
+      await hospitalRef
           .collection('conversations')
-          .doc(conversationId);
-
-      await convoRef.update({
+          .doc(conversationId)
+          .update({
         'lastMessage': messageText,
         'lastMessageTime': timestamp,
         'unreadCount.$adminId': FieldValue.increment(1),

@@ -15,7 +15,7 @@
 - [Link to repo](https://github.com/Isaiah-Essien/uboho_mobile)
 - [Link to result Analysis](https://docs.google.com/document/d/1VcpaDektwOJMmtjM2LOTRAUTh_5AqvCrXtK0OyX-ykY/edit?usp=sharing)
 - [Link to the Web dashabord's repo](https://github.com/Isaiah-Essien/uboho_web_dashboard)
-- [Link to Deployed web Dashboard](https://lighthearted-tapioca-426dd6.netlify.app/)
+- [Link to Deployed web Dashboard](https://quiet-elf-a156b4.netlify.app)
 
 ---
 ## What Uboho Does

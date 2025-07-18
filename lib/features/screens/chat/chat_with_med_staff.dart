@@ -74,26 +74,42 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
       patientId = patientDoc.id;
       patientName = patientDoc['name'] ?? '';
       adminId = patientDoc['createdBy'];
-      conversationId = '${patientId}_$adminId';
 
-      final conversationRef = hospitalRef.collection('conversations').doc(conversationId);
-      final conversationDoc = await conversationRef.get();
+      // UPDATED: Search for conversation where participants contains both patientId and adminId
+      final conversationQuery = await hospitalRef
+          .collection('conversations')
+          .where('participants', arrayContainsAny: [patientId, adminId])
+          .get();
 
-      if (!conversationDoc.exists) {
-        await conversationRef.set({
+      bool found = false;
+
+      for (final doc in conversationQuery.docs) {
+        final participants = List<String>.from(doc['participants'] ?? []);
+        if (participants.contains(patientId) && participants.contains(adminId)) {
+          conversationId = doc.id;
+          found = true;
+          await doc.reference.update({'unreadCount.$patientId': 0});
+          break;
+        }
+      }
+
+      if (!found) {
+        // If no conversation found, create new one with unique ID
+        final newDocRef = hospitalRef.collection('conversations').doc();
+        await newDocRef.set({
           'participants': [patientId, adminId],
           'lastMessage': '',
           'lastMessageTime': Timestamp.now(),
           'unreadCount': {
             patientId: 0,
             adminId: 0,
-          }
+          },
+          'createdAt': Timestamp.now(),
         });
-      } else {
-        await conversationRef.update({'unreadCount.$patientId': 0});
+        conversationId = newDocRef.id;
       }
 
-      // 🔁 Only now we call the listener
+      // Only now we call the listener
       listenForIncomingMessages(
         hospitalId: hospitalId,
         patientId: patientId,
@@ -113,7 +129,7 @@ class _ChatWithMedicalStaffScreenState extends State<ChatWithMedicalStaffScreen>
     required String patientId,
     required String adminId,
   }) {
-    final conversationId = '${patientId}_$adminId';
+    // UPDATED: Use the retrieved unique conversationId here
     final messagesRef = FirebaseFirestore.instance
         .collection('hospitals')
         .doc(hospitalId)
