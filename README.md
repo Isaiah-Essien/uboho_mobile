@@ -9,7 +9,7 @@
 
 ## Relevant Links
 - [Final Demo_video](https://drive.google.com/file/d/1XLzOHM6Bv0CMiRLJ8UZinhGnnOnriDTX/view?usp=drive_link)
-- [APK file](https://drive.google.com/file/d/1xGZNZcqJOa4IU_uPdhGtEf9_ZOSBCqpF/view?usp=sharing)
+- [APK file](https://drive.google.com/file/d/1CyZJVzHAs78LU5fboUboxDmElVrKxkoc/view?usp=sharing)
 - [figma design](https://www.figma.com/design/EjFiGZ5k5acmHJRQBd7kbL/Uboho?node-id=0-1&t=KELwLbz414nI3asK-1)
 - [Model Notebook](https://colab.research.google.com/drive/1A0p8y6ESvFTNLna3j7ZdFADVQKIYOiaY?usp=sharing)
 - [Link to repo](https://github.com/Isaiah-Essien/uboho_mobile)

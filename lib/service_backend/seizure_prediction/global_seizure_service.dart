@@ -104,7 +104,7 @@ class SeizureMonitorService {
             rotationPeak = 0;
           });
         } else {
-          debugPrint('❗ Unable to show seizure dialog — context is null.');
+          debugPrint(' Unable to show seizure dialog — context is null.');
         }
       }
     }

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:vibration/vibration.dart';
 import 'package:just_audio/just_audio.dart';
@@ -19,7 +18,7 @@ class SeizureAlertDialog extends StatefulWidget {
 }
 
 class _SeizureAlertDialogState extends State<SeizureAlertDialog> {
-  int _countdown = 30;
+  int _countdown = 10;
   Timer? _timer;
   final AudioPlayer _player = AudioPlayer();
   bool _hasPlayed = false;

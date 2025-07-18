@@ -135,7 +135,6 @@ class _AddEmergencyContactScreenState
               PrimaryButton(
                 text: "Add Contact",
                 onPressed: () async {
-                  // invoke each field’s built-in validation
                   if (!nameKey.currentState!.validate() ||
                       !relationKey.currentState!.validate() ||
                       !emailKey.currentState!.validate() ||
@@ -144,74 +143,64 @@ class _AddEmergencyContactScreenState
                     return;
                   }
 
-                  final uid =
-                      FirebaseAuth.instance.currentUser?.uid;
+                  final uid = FirebaseAuth.instance.currentUser?.uid;
                   if (uid == null) {
                     Get.snackbar("Error", "User not authenticated",
-                        backgroundColor:
-                        Colors.redAccent.withOpacity(0.5),
+                        backgroundColor: Colors.redAccent.withOpacity(0.5),
                         colorText: Colors.white,
-                        duration:
-                        const Duration(milliseconds: 1500));
+                        duration: const Duration(milliseconds: 1500));
                     return;
                   }
 
                   try {
-                    // find patientRef…
-                    final hospitals = await FirebaseFirestore.instance
-                        .collection('hospitals')
-                        .get();
+                    // Show circular progress indicator
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) => Center(
+                        child: CircularProgressIndicator(color: UColors.primaryColor),
+                      ),
+                    );
+
+                    final hospitals = await FirebaseFirestore.instance.collection('hospitals').get();
                     DocumentReference? patientRef;
 
                     for (final hospital in hospitals.docs) {
-                      final patients =
-                      hospital.reference.collection('patients');
-                      final query = await patients
-                          .where('authId', isEqualTo: uid)
-                          .limit(1)
-                          .get();
+                      final patients = hospital.reference.collection('patients');
+                      final query = await patients.where('authId', isEqualTo: uid).limit(1).get();
                       if (query.docs.isNotEmpty) {
-                        patientRef =
-                            query.docs.first.reference;
+                        patientRef = query.docs.first.reference;
                         break;
                       }
                     }
 
                     if (patientRef == null) {
-                      Get.snackbar("Error",
-                          "Patient record not found.",
-                          backgroundColor:
-                          Colors.redAccent.withOpacity(0.5),
+                      Navigator.of(context).pop();
+                      Get.snackbar("Error", "Patient record not found.",
+                          backgroundColor: Colors.redAccent.withOpacity(0.5),
                           colorText: Colors.white,
-                          duration:
-                          const Duration(milliseconds: 1500));
+                          duration: const Duration(milliseconds: 1500));
                       return;
                     }
 
                     final contact = {
                       'name': nameController.text.trim(),
-                      'relation':
-                      relationController.text.trim(),
+                      'relation': relationController.text.trim(),
                       'email': emailController.text.trim(),
                       'phone': phoneController.text.trim(),
                       'countryCode': selectedCountryCode,
                       'isPrimary': selectedPrimary == 'Yes',
-                      'createdAt':
-                      DateTime.now().toIso8601String(),
+                      'createdAt': DateTime.now().toIso8601String(),
                     };
 
                     final doc = await patientRef.get();
                     final data = doc.data() as Map<String, dynamic>? ?? {};
 
-                    // Safely get or initialize emergencyContacts
                     List existing = [];
-                    if (data.containsKey('emergencyContacts') &&
-                        data['emergencyContacts'] is List) {
-                      existing =
-                          List.from(data['emergencyContacts']);
+                    if (data.containsKey('emergencyContacts') && data['emergencyContacts'] is List) {
+                      existing = List.from(data['emergencyContacts']);
                     }
 
-                    // Unset previous primary if needed
                     if (selectedPrimary == 'Yes') {
                       existing = existing.map((c) {
                         c['isPrimary'] = false;
@@ -220,24 +209,19 @@ class _AddEmergencyContactScreenState
                     }
 
                     existing.add(contact);
-                    await patientRef.update({
-                      'emergencyContacts': existing,
-                    });
+                    await patientRef.update({'emergencyContacts': existing});
 
-                    Get.snackbar("Success",
-                        "Emergency contact added successfully!",
-                        backgroundColor:
-                        UColors.primaryColor,
-                        colorText: Colors.white);
+                    Navigator.of(context).pop(); // Remove loading
 
-                    await Future.delayed(
-                        const Duration(milliseconds: 1500));
+                    Get.snackbar("Success", "Emergency contact added successfully!",
+                        backgroundColor: UColors.primaryColor, colorText: Colors.white);
+
+                    await Future.delayed(const Duration(milliseconds: 1500));
                     Navigator.pop(context, true);
                   } catch (e) {
-                    Get.snackbar("Error",
-                        "Failed to add contact: ${e.toString()}",
-                        backgroundColor:
-                        Colors.redAccent.withOpacity(0.5),
+                    Navigator.of(context).pop();
+                    Get.snackbar("Error", "Failed to add contact: ${e.toString()}",
+                        backgroundColor: Colors.redAccent.withOpacity(0.5),
                         colorText: Colors.white);
                   }
                 },

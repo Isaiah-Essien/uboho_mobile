@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import '../../utiils/navigations/main_nav.dart';
+import '../../utiils/constants/colors.dart'; // Import UColors
 
 class PatientAccountController {
   static Future<void> activateAccountWithPassword({
@@ -15,6 +16,15 @@ class PatientAccountController {
     final auth = FirebaseAuth.instance;
 
     try {
+      // Show circular progress indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => Center(
+          child: CircularProgressIndicator(color: UColors.primaryColor),
+        ),
+      );
+
       // Step 1: Lookup hospital by name
       final hospitalQuery = await firestore
           .collection('hospitals')
@@ -23,6 +33,7 @@ class PatientAccountController {
           .get();
 
       if (hospitalQuery.docs.isEmpty) {
+        Navigator.of(context).pop(); // Remove loading
         _showError(context, "Hospital not found.");
         return;
       }
@@ -45,6 +56,7 @@ class PatientAccountController {
             .get();
 
         if (query.docs.isEmpty) {
+          Navigator.of(context).pop();
           _showError(context, "No patient with this email in this hospital.");
           return;
         }
@@ -55,6 +67,7 @@ class PatientAccountController {
       } else {
         final doc = await patientsRef.doc(patientInput).get();
         if (!doc.exists) {
+          Navigator.of(context).pop();
           _showError(context, "No patient with this ID in this hospital.");
           return;
         }
@@ -74,18 +87,17 @@ class PatientAccountController {
 
       if (methods.contains('password')) {
         if (alreadyActivated) {
-          // Don't overwrite active accounts
+          Navigator.of(context).pop();
           _showError(context, "This account is already activated. Please log in.");
           return;
         } else {
-          // Reclaim account: delete and recreate
           try {
             final tempUser = await auth.signInWithEmailAndPassword(
               email: email,
               password: password,
             );
 
-            await tempUser.user?.delete(); // remove ghost user
+            await tempUser.user?.delete();
 
             final created = await auth.createUserWithEmailAndPassword(
               email: email,
@@ -98,9 +110,11 @@ class PatientAccountController {
               'activatedAt': FieldValue.serverTimestamp(),
             });
 
+            Navigator.of(context).pop();
             Get.offAll(() => const MainNavigation());
             return;
           } catch (_) {
+            Navigator.of(context).pop();
             _showError(context, "This email was already registered, but no password was set. Please contact support to reset it.");
             return;
           }
@@ -119,8 +133,10 @@ class PatientAccountController {
         'activatedAt': FieldValue.serverTimestamp(),
       });
 
+      Navigator.of(context).pop();
       Get.offAll(() => const MainNavigation());
     } catch (e) {
+      Navigator.of(context).pop();
       _showError(context, "Error: ${e.toString()}");
     }
   }
