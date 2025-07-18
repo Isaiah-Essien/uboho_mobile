@@ -9,12 +9,12 @@
 
 ## Relevant Links
 - [Final Demo_video](https://drive.google.com/file/d/1XLzOHM6Bv0CMiRLJ8UZinhGnnOnriDTX/view?usp=drive_link)
-- [APK file](https://drive.google.com/file/d/1P6c8OTIzJb-7oPbrxBC6F3g80XjQEwq8/view?usp=drive_link)
+- [APK file](https://drive.google.com/file/d/1xGZNZcqJOa4IU_uPdhGtEf9_ZOSBCqpF/view?usp=sharing)
 - [figma design](https://www.figma.com/design/EjFiGZ5k5acmHJRQBd7kbL/Uboho?node-id=0-1&t=KELwLbz414nI3asK-1)
 - [Model Notebook](https://colab.research.google.com/drive/1A0p8y6ESvFTNLna3j7ZdFADVQKIYOiaY?usp=sharing)
 - [Link to repo](https://github.com/Isaiah-Essien/uboho_mobile)
 - [Link to result Analysis](https://docs.google.com/document/d/1VcpaDektwOJMmtjM2LOTRAUTh_5AqvCrXtK0OyX-ykY/edit?usp=sharing)
-- [Link to the Web dashabord's repo](https://github.com/Isaiah-Essien/uboho_web_dashboard)
+- [Link to the Web dashboard's repo](https://github.com/Isaiah-Essien/uboho_web_dashboard)
 - [Link to Deployed web Dashboard](https://quiet-elf-a156b4.netlify.app)
 
 ---
