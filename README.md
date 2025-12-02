@@ -171,13 +171,13 @@ flutter run
 
 This software is released under a **custom academic research license**. Key points:
 
-### ✅ Permitted Use:
+### Permitted Use:
 - Academic research
 - Non-commercial educational purposes
 - Personal experimentation
 - Modification for research (with attribution)
 
-### ❌ Restricted Use:
+### Restricted Use:
 - Commercial deployment without permission
 - Clinical use without regulatory approval
 - Integration into commercial products
@@ -194,3 +194,5 @@ This software is released under a **custom academic research license**. Key poin
 
 **Author:** Isaiah Edem Essien, African Leadership University, Rwanda
 **Associated Paper:** "Can Less Be More? Benchmarking State-of-the-Art Deep Learning Architectures Against Custom Lightweight Models for Deployable Seizure Detection"
+
+**Citation File:** [CITATION.cff](CITATION.cff) - For automated citation in academic tools
