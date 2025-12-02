@@ -167,4 +167,11 @@ flutter run
 ```
 - run `flutter build apk --release` to have an apk file of uboho
 
+## 📄 License
 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**This software is provided for academic research purposes only. Commercial use requires explicit permission from the authors.**
+
+## 🔒 Privacy & Ethical Considerations
+
+Uboho handles sensitive health data. All data processing occurs locally on the device where possible. No physiological data is transmitted to external servers without explicit consent. This application is intended as a research prototype and should not be used as a primary medical device without clinical validation.
