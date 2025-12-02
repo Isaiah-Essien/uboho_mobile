@@ -167,11 +167,30 @@ flutter run
 ```
 - run `flutter build apk --release` to have an apk file of uboho
 
-## 📄 License
+## 📄 License & Usage Terms
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-**This software is provided for academic research purposes only. Commercial use requires explicit permission from the authors.**
+This software is released under a **custom academic research license**. Key points:
 
-## 🔒 Privacy & Ethical Considerations
+### ✅ Permitted Use:
+- Academic research
+- Non-commercial educational purposes
+- Personal experimentation
+- Modification for research (with attribution)
 
-Uboho handles sensitive health data. All data processing occurs locally on the device where possible. No physiological data is transmitted to external servers without explicit consent. This application is intended as a research prototype and should not be used as a primary medical device without clinical validation.
+### ❌ Restricted Use:
+- Commercial deployment without permission
+- Clinical use without regulatory approval
+- Integration into commercial products
+- Use in for-profit healthcare settings
+
+### 🔒 Ethical Requirements:
+- Must comply with data protection laws (GDPR, HIPAA, etc.)
+- Requires appropriate ethics approvals for human subjects research
+- Must obtain informed consent for health data collection
+
+**Full License:** [LICENSE.md](LICENSE.md)
+
+**For commercial or clinical use inquiries:** Contact i.essien@alustudent.com
+
+**Author:** Isaiah Edem Essien, African Leadership University, Rwanda
+**Associated Paper:** "Can Less Be More? Benchmarking State-of-the-Art Deep Learning Architectures Against Custom Lightweight Models for Deployable Seizure Detection"
